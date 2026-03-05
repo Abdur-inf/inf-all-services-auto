@@ -29,7 +29,32 @@ def IEcode():
     time.sleep(4)
 
     if driver.find_elements(By.ID, "exmsg"):
-        print("Login failed")
+        wait.until(EC.element_to_be_clickable((By.ID, "Reg-main"))).click()
+
+        person_type = wait.until(EC.presence_of_element_located((By.ID, "personType")))
+        Select(person_type).select_by_visible_text("Importer/Exporter")
+
+        wait.until(EC.presence_of_element_located((By.ID, "txt_FirstName"))).send_keys("Rahim")
+        wait.until(EC.presence_of_element_located((By.ID, "txt_email"))).send_keys("rahim@example.com")
+        wait.until(EC.presence_of_element_located((By.ID, "txt_mobileNumber"))).send_keys("9876543210")
+        wait.until(EC.presence_of_element_located((By.ID, "txt_pincode"))).send_keys("612001")
+        wait.until(EC.presence_of_element_located((By.ID, "txt_city"))).send_keys("Kumbakonam")
+
+        wait.until(EC.presence_of_element_located((By.ID, "captcha")))
+        reg_captcha = input("Enter Register Captcha: ")
+        driver.find_element(By.ID, "txt_Captcha").send_keys(reg_captcha)
+
+        wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "label[for='termsAndCondition']"))).click()
+        wait.until(EC.element_to_be_clickable((By.ID, "otpsend"))).click()
+
+        email_otp = input("Enter Email OTP: ")
+        wait.until(EC.presence_of_element_located((By.ID, "txt_emailOTP"))).send_keys(email_otp)
+        
+        mobile_otp = input("Enter Mobile OTP: ")
+        wait.until(EC.presence_of_element_located((By.ID, "txt_mobileOTP"))).send_keys(mobile_otp)
+
+        wait.until(EC.element_to_be_clickable((By.ID, "registration_btn"))).click()
+
 
     elif driver.find_elements(By.XPATH, "//h6[normalize-space()='Change Password']"):
 
