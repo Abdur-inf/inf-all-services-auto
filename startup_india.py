@@ -9,6 +9,7 @@ import pyperclip
 import os
 import base64
 import tempfile
+import datetime
 
 
 def startup_india(data):
@@ -974,6 +975,6 @@ def startup_india(data):
         return e
     finally:
         #driver.quit()
-        return {"status":200,"message":f"Success completed {error}"}
+        return {"status":200,"message":f"Success completed {error}","timestamp":datetime.datetime.now().isoformat()}
 if __name__=='__main__':
     startup_india()

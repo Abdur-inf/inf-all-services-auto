@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from startup_india import startup_india as si
 from IEcode import IEcode as ie
+import datetime
 
 app = Flask(__name__)
 
@@ -12,7 +13,8 @@ def call_startup_india():
     if not data:
         return jsonify({
             "status": "error",
-            "message": "Missing JSON payload in the request body"
+            "message": "Missing JSON payload in the request body",
+            "timestamp": datetime.datetime.now().isoformat()
         }), 400
 
     result = si(data)
@@ -20,7 +22,8 @@ def call_startup_india():
     return jsonify({
         "status": "success",
         "message": "Script executed",
-        "result": result
+        "result": result,
+        "timestamp": datetime.datetime.now().isoformat()
     })
 
 @app.route("/IECODE", methods=["POST"])
@@ -29,19 +32,22 @@ def call_iecode():
     if not data:
         return jsonify({
             "status": "error",
-            "message": "Missing JSON payload in the request body"
+            "message": "Missing JSON payload in the request body",
+            "timestamp": datetime.datetime.now().isoformat()
         }), 400
     try:
         result = ie()
     except Exception as e:
         return jsonify({
             "status": "error",
-            "message": str(e)
+            "message": str(e),
+            "timestamp": datetime.datetime.now().isoformat()
         }), 500
     return jsonify({
         "status": "success",
         "message": "Script executed",
-        "result": result
+        "result": result,
+        "timestamp": datetime.datetime.now().isoformat()
     })
 
 
