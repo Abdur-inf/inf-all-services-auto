@@ -54,9 +54,10 @@ def IEcode():
         wait.until(EC.presence_of_element_located((By.ID, "txt_mobileOTP"))).send_keys(mobile_otp)
 
         wait.until(EC.element_to_be_clickable((By.ID, "registration_btn"))).click()
+        time.sleep(2)
 
 
-    elif driver.find_elements(By.XPATH, "//h6[normalize-space()='Change Password']"):
+    if driver.find_elements(By.XPATH, "//h6[normalize-space()='Change Password']"):
 
         current_pwd = input("Enter Current Password: ")
         new_pwd = input("Enter New Password: ")

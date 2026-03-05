@@ -766,7 +766,7 @@ def startup_india(data):
             time.sleep(2)
 
             # ===== SELECT TYPE : Pitch Deck =====
-            type_input = wait.until(EC.element_to_be_clickable((By.XPATH, "//label[.//span[text()='Type']]/following::input[contains(@class,'ant-select-selection-search-input')][1]")))
+            type_input = wait.until(EC.element_to_be_clickable((By.XPATH, "(//label[.//span[text()='Type']]/following::input[contains(@class,'ant-select-selection-search-input')][1])[1]")))
 
             driver.execute_script("arguments[0].scrollIntoView({block:'center'});", type_input)
 
