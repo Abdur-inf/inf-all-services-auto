@@ -9,7 +9,7 @@ flask run --port 5000
 ### to call api like this
 http://localhost:5000/startup_india
 
-
+<code>
 {
   "comp_address": {
     "address1": "address1",
@@ -50,24 +50,24 @@ http://localhost:5000/startup_india
   "Catogries": ["Governments","Online Aggregator","E-commerce","Subscription Commerce"],
   "stage": "Ideation",
   "no_of_emp": "2",
-  "aboutcompany": "We are on a mission to make Entrepreneurship easier and affordable to millions. IndiaFilings provides a simple and intuitive platform for setting up a business and managing compliance. We started our journey in 2014 and bootstrapped the business till 2022, serving over 1 lakh businesses. In 2022, we raised funding from institutional investors to further our mission.",
-  "who_we_are": "RAHIM is an AI company specializing in the NLP sector, aiming to revolutionize government, hyperlocal, discovery, and location-based services. Our team is a dedicated group of innovators and entrepreneurs working relentlessly since 2014. As of 2022, we served over 1 lakh businesses and managed to secure institutional funding for further growth.",
-  "Problem Statement": "In India, setting up a business and managing its compliance can be a complex and daunting process. Entrepreneurs often struggle with the labyrinth of legal procedures, taxation, and various other business aspects, which can stifle growth and limit potential.",
-  "solution": "RAHIM offers an intuitive platform where new and existing businesses can operate and manage compliance easily and affordably. Featuring a system that handles every aspect of the business lifecycle, we lessen the burden on entrepreneurs, allowing them to focus more on their core business objectives rather than on red tape.",
-  "uniqueness": "What sets RAHIM apart is our use of AI and NLP in creating an unprecedented platform for business setup and compliance management. Beyond regular services, we offer a value-based system that drives down costs while maintaining quality and efficiency in business operations and compliance.",
-  "Revenue Growth": "Our revenue model is based on a freemium strategy a basic version of our platform is available for free, while premium features are accessible for a nominal fee. With our institutional funding, we plan to expand our offerings, increase our customer base, and embark on an aggressive growth strategy that delivers improved platform features and customer experiences.",
+  "aboutcompany": "",
+  "who_we_are": "",
+  "solution": "",
+  "uniqueness": "",
+  "Revenue Growth": "",
   "lOGO_file": "base64_code",
   "LOA_file": "base64_code",
   "COI_file": "base64_code",
   "pitchdesk_file": "base64_code"
 }
-
+</code>
 
 # to call api like this
 http://localhost:5000/IECODE
 
+<code>
 {
     "username":"abdurrahim251103@gmail.com",
     "password":"India@123"
 }
-
+</code>
