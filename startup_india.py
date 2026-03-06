@@ -57,11 +57,38 @@ def startup_india(data):
 
             # =============================== #
             #       Dashboard navigation      #
-            # =============================== #       
+            # =============================== #      
 
+            # Bussiness Name to click  
             wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, ".content-list"))).click()
-
-            wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".button.action-button"))).click()
+            # Apply Button to click this line
+            #wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".button.action-button"))).click()
+            time.sleep(10)
+            if driver.find_elements(By.CSS_SELECTOR, ".button.action-button"):
+                print("Apply button show")
+                wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".button.action-button"))).click()
+                time.sleep(10)
+            else:
+                print("APply not button show")
+                main_window = driver.current_window_handle
+                wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "div.search-icon"))).click()
+                search_box = wait.until(EC.presence_of_element_located((By.NAME, "global_search")))
+                search_box.clear()
+                for ch in "Registration as a Startup":
+                    search_box.send_keys(ch)
+                    time.sleep(0.2)
+                wait.until(EC.element_to_be_clickable((By.XPATH, "//li[contains(text(),'Registration as a Startup')]"))).click()
+                wait.until(EC.number_of_windows_to_be(2))
+                for window in driver.window_handles:
+                    if window != main_window:
+                        driver.switch_to.window(window)
+                        break
+                wait.until(EC.element_to_be_clickable((By.XPATH, "//button[normalize-space()='Add to Dashboard']"))).click()
+                driver.close()
+                driver.switch_to.window(main_window)
+                driver.refresh()
+                time.sleep(10)
+                wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".button.action-button"))).click()            
 
             # =============================== #
             #       Start Page started        #
@@ -348,59 +375,59 @@ def startup_india(data):
 
             ##paste the code
 
-            # Click Mobile Get OTP
-            wait.until(EC.element_to_be_clickable((By.ID, "CheckMobileVerification"))).click()
+            # # Click Mobile Get OTP
+            # wait.until(EC.element_to_be_clickable((By.ID, "CheckMobileVerification"))).click()
 
-            time.sleep(2)
+            # time.sleep(2)
 
-            # Click Email Get OTP
-            # Wait until Email OTP button is enabled
-            wait.until(lambda d: d.find_element(By.ID, "CheckEmailVerification").is_enabled())
+            # # Click Email Get OTP
+            # # Wait until Email OTP button is enabled
+            # wait.until(lambda d: d.find_element(By.ID, "CheckEmailVerification").is_enabled())
 
-            email_btn = driver.find_element(By.ID, "CheckEmailVerification")
+            # email_btn = driver.find_element(By.ID, "CheckEmailVerification")
 
-            # Scroll into view
-            driver.execute_script("arguments[0].scrollIntoView({block:'center'});", email_btn)
+            # # Scroll into view
+            # driver.execute_script("arguments[0].scrollIntoView({block:'center'});", email_btn)
 
-            # CLICK OUTSIDE (very important for Ant Design forms)
-            driver.execute_script("document.body.click();")
+            # # CLICK OUTSIDE (very important for Ant Design forms)
+            # driver.execute_script("document.body.click();")
 
-            # Small wait for UI settle
-            wait.until(lambda d: email_btn.is_displayed())
+            # # Small wait for UI settle
+            # wait.until(lambda d: email_btn.is_displayed())
 
-            # Now click Email Get OTP
-            email_btn.click()
-
-
-            # Enter Mobile OTP (without using dynamic name)
-
-            mobile_otp = input("Enter Mobile OTP: ")
-
-            mobile_otp_input = wait.until(EC.presence_of_element_located((By.XPATH, "//label[.//span[text()='Mobile Number']]/following::input[@type='password'][1]")))
-
-            driver.execute_script("arguments[0].removeAttribute('disabled')", mobile_otp_input)
-            mobile_otp_input.clear()
-            mobile_otp_input.send_keys(mobile_otp)
-
-            # Enter Email OTP (without using dynamic name)
-
-            email_otp = input("Enter Email OTP: ")
-
-            email_otp_input = wait.until(EC.presence_of_element_located((By.XPATH, "//label[.//span[text()='Email Address']]/following::input[@type='password'][1]")))
-
-            driver.execute_script("arguments[0].removeAttribute('disabled')", email_otp_input)
-            email_otp_input.clear()
-            email_otp_input.send_keys(email_otp)
+            # # Now click Email Get OTP
+            # email_btn.click()
 
 
-            # Click both Validate buttons
+            # # Enter Mobile OTP (without using dynamic name)
 
-            validate_buttons = wait.until(EC.presence_of_all_elements_located((By.XPATH, "//button[normalize-space()='Validate']")))
+            # mobile_otp = input("Enter Mobile OTP: ")
 
-            for btn in validate_buttons:
-                time.sleep(2)
-                driver.execute_script("arguments[0].removeAttribute('disabled')", btn)
-                btn.click()
+            # mobile_otp_input = wait.until(EC.presence_of_element_located((By.XPATH, "//label[.//span[text()='Mobile Number']]/following::input[@type='password'][1]")))
+
+            # driver.execute_script("arguments[0].removeAttribute('disabled')", mobile_otp_input)
+            # mobile_otp_input.clear()
+            # mobile_otp_input.send_keys(mobile_otp)
+
+            # # Enter Email OTP (without using dynamic name)
+
+            # email_otp = input("Enter Email OTP: ")
+
+            # email_otp_input = wait.until(EC.presence_of_element_located((By.XPATH, "//label[.//span[text()='Email Address']]/following::input[@type='password'][1]")))
+
+            # driver.execute_script("arguments[0].removeAttribute('disabled')", email_otp_input)
+            # email_otp_input.clear()
+            # email_otp_input.send_keys(email_otp)
+
+
+            # # Click both Validate buttons
+
+            # validate_buttons = wait.until(EC.presence_of_all_elements_located((By.XPATH, "//button[normalize-space()='Validate']")))
+
+            # for btn in validate_buttons:
+            #     time.sleep(2)
+            #     driver.execute_script("arguments[0].removeAttribute('disabled')", btn)
+            #     btn.click()
 
 
             ##paste the code 
@@ -773,11 +800,10 @@ def startup_india(data):
             type_input.click()
             type_input.send_keys(Keys.CONTROL + "a")
             type_input.send_keys(Keys.DELETE)
+            time.sleep(1)
 
             type_input.send_keys("Pitch Desk")
-
             time.sleep(2)
-
             type_input.send_keys(Keys.ENTER)
 
 
@@ -947,20 +973,21 @@ def startup_india(data):
             driver.execute_script("arguments[0].click();", self_cert_header)
             
             input("Press Enter to close browser...")            
-            draft_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(@class,'caf-save-as-draft')]")))
-            driver.execute_script("arguments[0].scrollIntoView({block:'center'});", draft_button)
-            driver.execute_script("arguments[0].click();", draft_button)
+            # draft_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(@class,'caf-save-as-draft')]")))
+            # driver.execute_script("arguments[0].scrollIntoView({block:'center'});", draft_button)
+            # driver.execute_script("arguments[0].click();", draft_button)
             time.sleep(5)
             submit_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(@class,'caf-review-submit')]")))
             driver.execute_script("arguments[0].scrollIntoView({block:'center'});", submit_button)
             driver.execute_script("arguments[0].click();", submit_button)
-
+            time.sleep(2)
             status = driver.find_element(By.XPATH, "//span[contains(@class,'form-status-title')]").text
             if "Incomplete data" in status:
                 print("Form is incomplete")
                 sections = driver.find_elements(By.XPATH,"//span[contains(text(),'Incomplete data')]/ancestor::div[contains(@class,'ant-collapse-header')]")
                 print(len(sections))
                 return {"status":200,"message":"Form is incomplete","data":status,"sections":sections,"length":len(sections)}
+            time.sleep(2)
             checkbox = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[contains(@class,'ant-checkbox-inner')]")))
             driver.execute_script("arguments[0].click();", checkbox)
             input("Press Enter to close browser...")
