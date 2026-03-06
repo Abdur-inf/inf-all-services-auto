@@ -70,12 +70,16 @@ http://localhost:5000/startup_india
 </code>
 
 # to call api like this
+```
 http://localhost:5000/IECODE
-
+```
+```
 <code>
 {
     "username":"abdurrahim251103@gmail.com",
     "password":"India@123"
 }
 </code>
+```
+
 
