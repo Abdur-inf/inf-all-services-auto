@@ -1,13 +1,20 @@
 # inf-all-services-auto
 
 ### To install the requirements
+
+```
 pip install -r requirements.txt
+```
 
 ### To run the flask app
+```
 flask run --port 5000
+```
 
 ### to call api like this
+```
 http://localhost:5000/startup_india
+```
 
 <code>
 {
@@ -71,3 +78,4 @@ http://localhost:5000/IECODE
     "password":"India@123"
 }
 </code>
+
