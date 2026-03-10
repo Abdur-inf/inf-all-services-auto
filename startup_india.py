@@ -10,21 +10,41 @@ import os
 import base64
 import tempfile
 import datetime
-import logging
+import log
+import colorlog
 
-logging.basicConfig(level=logging.INFO,format="%(asctime)s - %(levelname)s - %(message)s - %(filename)s - %(lineno)d - %(name)s")
-logging.debug("Debug message")
-logging.info("Program started")
-logging.warning("Low disk space")
-logging.error("File not found")
-logging.critical("System crash")
+handler = colorlog.StreamHandler()
+
+formatter = colorlog.ColoredFormatter(
+    "%(log_color)s%(levelname)s:%(name)s:%(message)s",
+    log_colors={
+        'DEBUG': 'cyan',
+        'INFO': 'green',
+        'WARNING': 'yellow',
+        'ERROR': 'red',
+        'CRITICAL': 'bold_red',
+    }
+)
+
+handler.setFormatter(formatter)
+
+log = colorlog.getLogger()
+log.addHandler(handler)
+log.setLevel(log.DEBUG)
+
+log.basicConfig(level=log.INFO,format="%(asctime)s - %(levelname)s - %(message)s - %(filename)s - %(lineno)d - %(name)s")
+log.debug("Debug message")
+log.info("Program started")
+log.warning("Low disk space")
+log.error("File not found")
+log.critical("System crash")
 
 def clipboard(value):
     pyperclip.copy(value)
     time.sleep(1)
 
 def startup_india(data):
-    logging.info("Program started")
+    log.info("Program started")
     error = ""
     data = data or {}
     try:
@@ -33,7 +53,7 @@ def startup_india(data):
         driver.get("https://www.nsws.gov.in/")        
 
         wait = WebDriverWait(driver, 15)
-        logging.info("Page opened")
+        log.info("Page opened")
 
         # Close popups
         wait.until(EC.element_to_be_clickable((By.ID, "close-popup"))).click()
@@ -61,7 +81,7 @@ def startup_india(data):
         
 
         wait.until(EC.element_to_be_clickable((By.ID, "kc-login"))).click()
-        logging.info("Credentials fetched")
+        log.info("Credentials fetched")
 
         # =============================== #
         #       Login validation          #
@@ -70,9 +90,9 @@ def startup_india(data):
         try:
             WebDriverWait(driver, 5).until(EC.visibility_of_element_located((By.ID, "input-error-email-login")))
             driver.quit()
-            logging.error("Login failed")
+            log.error("Login failed")
         except TimeoutException:
-            logging.info("Login successful")
+            log.info("Login successful")
 
             # =============================== #
             #       Dashboard navigation      #
@@ -84,11 +104,11 @@ def startup_india(data):
             #wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".button.action-button"))).click()
             time.sleep(15)
             if driver.find_elements(By.CSS_SELECTOR, ".button.action-button"):
-                logging.info("Apply button show")
+                log.info("Apply button show")
                 wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".button.action-button"))).click()
                 time.sleep(10)
             else:
-                logging.warning("Apply button not show")
+                log.warning("Apply button not show")
                 main_window = driver.current_window_handle
                 wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "div.search-icon"))).click()
                 search_box = wait.until(EC.presence_of_element_located((By.NAME, "global_search")))
@@ -108,13 +128,13 @@ def startup_india(data):
                 driver.refresh()
                 time.sleep(10)
                 wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".button.action-button"))).click()        
-                logging.info("Apply button clicked")    
+                log.info("Apply button clicked")    
 
             # =============================== #
             #       Start Page started        #
             # =============================== #    
 
-            logging.info("Start Page started")  
+            log.info("Start Page started")  
 
             # Click the visible selector area (NOT the input)
             selector = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "div.document-type-control .ant-select-selector")))
@@ -213,13 +233,13 @@ def startup_india(data):
             element.click()
             time.sleep(2)
 
-            logging.debug("Start Up Profile Complete")
+            log.debug("Start Up Profile Complete")
 
             # =============================== #
             #       Entity Details            #
             # =============================== #
 
-            logging.info("Entity Details Started")
+            log.info("Entity Details Started")
 
             # Click "Entity Details" collapse header
 
@@ -309,13 +329,13 @@ def startup_india(data):
             driver.execute_script("arguments[0].click();", elements)
 
             time.sleep(1)
-            logging.debug("Entity Details Completed")
+            log.debug("Entity Details Completed")
 
             # =============================== #
             #       Full Address(Office)      #
             # =============================== #
 
-            logging.info("Full Address(Office) Started")
+            log.info("Full Address(Office) Started")
 
             # Click "Full Address(Office)" collapse header
 
@@ -373,13 +393,13 @@ def startup_india(data):
             driver.execute_script("arguments[0].click();", element)
             time.sleep(1)
 
-            logging.debug("Full Address(Office) Completed")
+            log.debug("Full Address(Office) Completed")
 
             # =========================================== #
             #       Authorized Representative Details     #
             # =========================================== #
 
-            logging.info("Authorized Representative Details Started")
+            log.info("Authorized Representative Details Started")
 
             # Click "Authorized Representative Details" collapse header
 
@@ -416,9 +436,9 @@ def startup_india(data):
             wait.until(EC.visibility_of_element_located((By.ID, "Email Address"))).clear()
             wait.until(EC.visibility_of_element_located((By.ID, "Email Address"))).send_keys(Keys.CONTROL, "v")
             otp = data.get("otp")
-            logging.debug("OTP: ", otp)
+            log.debug("OTP: ", otp)
             if otp=="1":
-                logging.critical("Otp will be triggered")
+                log.critical("Otp will be triggered")
                 ##paste the code
                 # Click Mobile Get OTP
                 wait.until(EC.element_to_be_clickable((By.ID, "CheckMobileVerification"))).click()
@@ -441,14 +461,14 @@ def startup_india(data):
                 driver.execute_script("arguments[0].removeAttribute('disabled')", mobile_otp_input)     
                 mobile_otp_input.clear()
                 mobile_otp_input.send_keys(mobile_otp)
-                logging.critical("Mobile OTP: ", mobile_otp)
+                log.critical("Mobile OTP: ", mobile_otp)
                 # Enter Email OTP (without using dynamic name)
                 email_otp = input("Enter Email OTP: ")
                 email_otp_input = wait.until(EC.presence_of_element_located((By.XPATH, "//label[.//span[text()='Email Address']]/following::input[@type='password'][1]")))
                 driver.execute_script("arguments[0].removeAttribute('disabled')", email_otp_input)
                 email_otp_input.clear()
                 email_otp_input.send_keys(email_otp)
-                logging.critical("Email OTP: ", email_otp)
+                log.critical("Email OTP: ", email_otp)
                 # Click both Validate buttons
                 validate_buttons = wait.until(EC.presence_of_all_elements_located((By.XPATH, "//button[normalize-space()='Validate']")))
                 for btn in validate_buttons:
@@ -467,14 +487,14 @@ def startup_india(data):
             # Click "Director(s) / Partner(s) Details" collapse header
 
             time.sleep(2)
-            logging.debug("Director(s) / Partner(s) Details")
+            log.debug("Director(s) / Partner(s) Details")
 
             # wait.until(EC.element_to_be_clickable((By.XPATH, "//span[normalize-space()='Director(s) / Partner(s) Details']/ancestor::div[contains(@class,'ant-collapse-header')]"))).click()
 
             # =========================================== #
             #       Director(s) / Partner(s) Details      #
             # =========================================== #
-            logging.info("Director(s) / Partner(s) Details Started")
+            log.info("Director(s) / Partner(s) Details Started")
 
             no_of_dir = len(data.get("directors"))
             wait = WebDriverWait(driver, 20)
@@ -564,13 +584,13 @@ def startup_india(data):
 
                 driver.execute_script("arguments[0].click();", header)
             
-            logging.debug("Director(s) / Partner(s) Details Completed")
+            log.debug("Director(s) / Partner(s) Details Completed")
 
 
             # =========================================== #
             #       Information required                  #
             # =========================================== #
-            logging.info("Information required Started")
+            log.info("Information required Started")
 
             element=wait.until(EC.element_to_be_clickable((By.XPATH, "//span[normalize-space()='Information required']/ancestor::div[contains(@class,'ant-collapse-header')]")))
             driver.execute_script("arguments[0].scrollIntoView({block:'center'});", element)
@@ -607,13 +627,13 @@ def startup_india(data):
             driver.execute_script("arguments[0].click();", element)
             time.sleep(1)
 
-            logging.debug("Information required Completed")
+            log.debug("Information required Completed")
 
             # =========================================== #
             #       Nature of Startup                     #
             # =========================================== #
 
-            logging.info("Nature of Startup Started")
+            log.info("Nature of Startup Started")
 
             nature_header = wait.until(EC.presence_of_element_located((By.XPATH, "//span[normalize-space()='Nature of Startup']/ancestor::div[contains(@class,'ant-collapse-header')]")))
 
@@ -636,13 +656,13 @@ def startup_india(data):
             driver.execute_script("document.body.click();")
             driver.execute_script("arguments[0].click();", nature_header)
 
-            logging.debug("Nature of Startup Completed")
+            log.debug("Nature of Startup Completed")
 
             # ======================================================= #
             #       Is the startup creating an innovative product...  #
             # ======================================================= #
 
-            logging.info("Is the startup creating an innovative product Started")
+            log.info("Is the startup creating an innovative product Started")
 
             innovation_header = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(normalize-space(),'Is the startup creating an innovative product')]/ancestor::div[contains(@class,'ant-collapse-header')]")))
 
@@ -681,13 +701,13 @@ def startup_india(data):
             driver.execute_script("document.body.click();")
             driver.execute_script("arguments[0].click();", innovation_header)
 
-            logging.debug("Is the startup creating an innovative product Completed")
+            log.debug("Is the startup creating an innovative product Completed")
             
             # =========================================================== #
             #       Is the startup creating a scalable business model...  #
             # =========================================================== #
 
-            logging.info("Is the startup creating a scalable business model Started")
+            log.info("Is the startup creating a scalable business model Started")
 
             scalable_header = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(normalize-space(),'Is the startup creating a scalable business model')]/ancestor::div[contains(@class,'ant-collapse-header')]")))
 
@@ -720,13 +740,13 @@ def startup_india(data):
             driver.execute_script("document.body.click();")
             driver.execute_script("arguments[0].click();", scalable_header)
 
-            logging.debug("Is the startup creating a scalable business model Completed")
+            log.debug("Is the startup creating a scalable business model Completed")
 
             # ========================================= #
             #       Fill brief note textarea ....       #
             # ========================================= #
 
-            logging.info("Fill brief note textarea Started")
+            log.info("Fill brief note textarea Started")
 
             note_header = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(normalize-space(),'Please submit a brief note supporting')]/ancestor::div[contains(@class,'ant-collapse-header')]")))
             driver.execute_script("arguments[0].scrollIntoView({block:'center'});", note_header)
@@ -774,13 +794,13 @@ def startup_india(data):
             driver.execute_script("document.body.click();")
             driver.execute_script("arguments[0].click();", funding_header)
 
-            logging.debug("Has your startup received any funding Completed")
+            log.debug("Has your startup received any funding Completed")
 
             # ==================================== #
             #       Startup Activities ....        #
             # ==================================== #
 
-            logging.info("Startup Activities Started")
+            log.info("Startup Activities Started")
 
             # Click "Startup Activities" collapse header safely
 
@@ -838,13 +858,13 @@ def startup_india(data):
             driver.execute_script("document.body.click();")
             driver.execute_script("arguments[0].click();", activities_header)
 
-            logging.debug("Startup Activities Completed")
+            log.debug("Startup Activities Completed")
 
             # ============================================ #
             #       Support Documents ....(pitch deck)     #
             # ============================================ #
 
-            logging.info("Support Documents Started")
+            log.info("Support Documents Started")
 
             # Click collapse header:
             # "1. Please provide links or upload additional document..."
@@ -970,13 +990,13 @@ def startup_india(data):
             driver.execute_script("document.body.click();")
             driver.execute_script("arguments[0].click();", support_doc_header)
 
-            logging.debug("Support Documents Completed")
+            log.debug("Support Documents Completed")
 
             # ==================================== #
             #       Self Certification ....        #
             # ==================================== #
 
-            logging.info("Self Certification Started")
+            log.info("Self Certification Started")
 
             self_cert_header = wait.until(EC.presence_of_element_located((By.XPATH, "//span[normalize-space()='Self Certification']/ancestor::div[contains(@class,'ant-collapse-header')]")))
             driver.execute_script("arguments[0].scrollIntoView({block:'center'});", self_cert_header)
