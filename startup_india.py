@@ -373,42 +373,43 @@ def startup_india(data):
             email_value = data.get("username") #data.get("directors", [{}])[0].get("Email")
             wait.until(EC.visibility_of_element_located((By.ID, "Email Address"))).clear()
             wait.until(EC.visibility_of_element_located((By.ID, "Email Address"))).send_keys(email_value)
-
-            ##paste the code
-            # Click Mobile Get OTP
-            wait.until(EC.element_to_be_clickable((By.ID, "CheckMobileVerification"))).click()
-            time.sleep(2)
-            # Click Email Get OTP
-            # Wait until Email OTP button is enabled
-            wait.until(lambda d: d.find_element(By.ID, "CheckEmailVerification").is_enabled())
-            email_btn = driver.find_element(By.ID, "CheckEmailVerification")
-            # Scroll into view
-            driver.execute_script("arguments[0].scrollIntoView({block:'center'});", email_btn)
-            # CLICK OUTSIDE (very important for Ant Design forms)
-            driver.execute_script("document.body.click();")
-            # Small wait for UI settle
-            wait.until(lambda d: email_btn.is_displayed())
-            # Now click Email Get OTP
-            email_btn.click()
-            # Enter Mobile OTP (without using dynamic name)
-            mobile_otp = input("Enter Mobile OTP: ")
-            mobile_otp_input = wait.until(EC.presence_of_element_located((By.XPATH, "//label[.//span[text()='Mobile Number']]/following::input[@type='password'][1]")))
-            driver.execute_script("arguments[0].removeAttribute('disabled')", mobile_otp_input)     
-            mobile_otp_input.clear()
-            mobile_otp_input.send_keys(mobile_otp)
-            # Enter Email OTP (without using dynamic name)
-            email_otp = input("Enter Email OTP: ")
-            email_otp_input = wait.until(EC.presence_of_element_located((By.XPATH, "//label[.//span[text()='Email Address']]/following::input[@type='password'][1]")))
-            driver.execute_script("arguments[0].removeAttribute('disabled')", email_otp_input)
-            email_otp_input.clear()
-            email_otp_input.send_keys(email_otp)
-            # Click both Validate buttons
-            validate_buttons = wait.until(EC.presence_of_all_elements_located((By.XPATH, "//button[normalize-space()='Validate']")))
-            for btn in validate_buttons:
+            otp = data.get("otp")
+            if otp=="1":
+                ##paste the code
+                # Click Mobile Get OTP
+                wait.until(EC.element_to_be_clickable((By.ID, "CheckMobileVerification"))).click()
                 time.sleep(2)
-                driver.execute_script("arguments[0].removeAttribute('disabled')", btn)
-                btn.click()
-            ##paste the code 
+                # Click Email Get OTP
+                # Wait until Email OTP button is enabled
+                wait.until(lambda d: d.find_element(By.ID, "CheckEmailVerification").is_enabled())
+                email_btn = driver.find_element(By.ID, "CheckEmailVerification")
+                # Scroll into view
+                driver.execute_script("arguments[0].scrollIntoView({block:'center'});", email_btn)
+                # CLICK OUTSIDE (very important for Ant Design forms)
+                driver.execute_script("document.body.click();")
+                # Small wait for UI settle
+                wait.until(lambda d: email_btn.is_displayed())
+                # Now click Email Get OTP
+                email_btn.click()
+                # Enter Mobile OTP (without using dynamic name)
+                mobile_otp = input("Enter Mobile OTP: ")
+                mobile_otp_input = wait.until(EC.presence_of_element_located((By.XPATH, "//label[.//span[text()='Mobile Number']]/following::input[@type='password'][1]")))
+                driver.execute_script("arguments[0].removeAttribute('disabled')", mobile_otp_input)     
+                mobile_otp_input.clear()
+                mobile_otp_input.send_keys(mobile_otp)
+                # Enter Email OTP (without using dynamic name)
+                email_otp = input("Enter Email OTP: ")
+                email_otp_input = wait.until(EC.presence_of_element_located((By.XPATH, "//label[.//span[text()='Email Address']]/following::input[@type='password'][1]")))
+                driver.execute_script("arguments[0].removeAttribute('disabled')", email_otp_input)
+                email_otp_input.clear()
+                email_otp_input.send_keys(email_otp)
+                # Click both Validate buttons
+                validate_buttons = wait.until(EC.presence_of_all_elements_located((By.XPATH, "//button[normalize-space()='Validate']")))
+                for btn in validate_buttons:
+                    time.sleep(2)
+                    driver.execute_script("arguments[0].removeAttribute('disabled')", btn)
+                    btn.click()
+                ##paste the code 
 
             element=wait.until(EC.element_to_be_clickable((By.XPATH, "//span[normalize-space()='Authorized Representative Details']/ancestor::div[contains(@class,'ant-collapse-header')]")))
             driver.execute_script("arguments[0].scrollIntoView({block:'center'});", element)
