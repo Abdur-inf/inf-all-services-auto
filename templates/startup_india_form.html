@@ -1039,7 +1039,7 @@ async function submitToAPI() {
   apiSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   try {
-    const res = await fetch('http://127.0.0.1:5000/startup_india', {
+    const res = await fetch('/startup_india', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)

@@ -4,6 +4,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 import time
 import pyperclip
 import os
@@ -57,8 +59,17 @@ def startup_india(data):
     error = ""
     data = data or {}
     try:
-        driver = webdriver.Chrome()
-        driver.maximize_window()
+        options = webdriver.ChromeOptions()
+        options.add_argument("--headless=new")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--disable-gpu")
+        options.add_argument("--window-size=1920,1080")
+        options.add_argument("--disable-blink-features=AutomationControlled")
+        options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        options.add_experimental_option("useAutomationExtension", False)
+        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+        driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
         driver.get("https://www.nsws.gov.in/")        
 
         wait = WebDriverWait(driver, 15)
@@ -428,13 +439,13 @@ def startup_india(data):
             wait.until(EC.visibility_of_element_located((By.ID, "Name"))).send_keys(Keys.CONTROL, "v")
 
             # Fill Designation
-            designation_value = "Director"
+            designation_value = data.get("directors", [{}])[0].get("Designation", "Director")
             clipboard(designation_value)
             wait.until(EC.visibility_of_element_located((By.ID, "Designation"))).clear()
             wait.until(EC.visibility_of_element_located((By.ID, "Designation"))).send_keys(Keys.CONTROL, "v")
 
             # Fill Mobile Number
-            mobile_value = data.get("mobile")#data.get("directors", [{}])[0].get("Mobile_no")
+            mobile_value = data.get("mobile_no")#data.get("directors", [{}])[0].get("Mobile_no")
             clipboard(mobile_value)
             wait.until(EC.visibility_of_element_located((By.ID, "Mobile Number"))).clear()
             wait.until(EC.visibility_of_element_located((By.ID, "Mobile Number"))).send_keys(Keys.CONTROL, "v")
@@ -445,7 +456,7 @@ def startup_india(data):
             wait.until(EC.visibility_of_element_located((By.ID, "Email Address"))).clear()
             wait.until(EC.visibility_of_element_located((By.ID, "Email Address"))).send_keys(Keys.CONTROL, "v")
             otp = data.get("otp")
-            log.info("OTP: ", otp)
+            log.info(f"OTP: {otp}")
             if otp=="1":
                 log.critical("Otp will be triggered")
                 ##paste the code
@@ -465,19 +476,30 @@ def startup_india(data):
                 # Now click Email Get OTP
                 email_btn.click()
                 # Enter Mobile OTP (without using dynamic name)
-                mobile_otp = input("Enter Mobile OTP: ")
+                # ── Wait for OTP from browser via queue ──
+                otp_req_q  = data.get("_otp_request_queue")
+                otp_resp_q = data.get("_otp_response_queue")
+                if otp_req_q:
+                    log.info("Sending OTP request signal to browser...")
+                    otp_req_q.put({"event": "otp_needed", "message": "Enter Mobile OTP and Email OTP"})
+                    log.info("Waiting for OTP from browser (up to 5 minutes)...")
+                    otp_data = otp_resp_q.get(timeout=300)
+                    mobile_otp = otp_data.get("mobile_otp", "")
+                    email_otp  = otp_data.get("email_otp", "")
+                else:
+                    mobile_otp = input("Enter Mobile OTP: ")
+                    email_otp  = input("Enter Email OTP: ")
                 mobile_otp_input = wait.until(EC.presence_of_element_located((By.XPATH, "//label[.//span[text()='Mobile Number']]/following::input[@type='password'][1]")))
                 driver.execute_script("arguments[0].removeAttribute('disabled')", mobile_otp_input)     
                 mobile_otp_input.clear()
                 mobile_otp_input.send_keys(mobile_otp)
-                log.critical("Mobile OTP: ", mobile_otp)
+                log.critical(f"Mobile OTP: {mobile_otp}")
                 # Enter Email OTP (without using dynamic name)
-                email_otp = input("Enter Email OTP: ")
                 email_otp_input = wait.until(EC.presence_of_element_located((By.XPATH, "//label[.//span[text()='Email Address']]/following::input[@type='password'][1]")))
                 driver.execute_script("arguments[0].removeAttribute('disabled')", email_otp_input)
                 email_otp_input.clear()
                 email_otp_input.send_keys(email_otp)
-                log.critical("Email OTP: ", email_otp)
+                log.critical(f"Email OTP: {email_otp}")
                 # Click both Validate buttons
                 validate_buttons = wait.until(EC.presence_of_all_elements_located((By.XPATH, "//button[normalize-space()='Validate']")))
                 for btn in validate_buttons:
@@ -1111,12 +1133,12 @@ def startup_india(data):
             driver.execute_script("document.body.click();")
             driver.execute_script("arguments[0].click();", self_cert_header)
             
-            input("Press Enter to close browser...to save as draft")            
+            log.info("Auto-proceeding: Save as Draft")            
             draft_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(@class,'caf-save-as-draft')]")))
             driver.execute_script("arguments[0].scrollIntoView({block:'center'});", draft_button)
             driver.execute_script("arguments[0].click();", draft_button)
             time.sleep(5)
-            input("Press Enter to close browser...to first submit")
+            log.info("Auto-proceeding: First Submit")
             submit_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(@class,'caf-review-submit')]")))
             driver.execute_script("arguments[0].scrollIntoView({block:'center'});", submit_button)
             driver.execute_script("arguments[0].click();", submit_button)
@@ -1130,12 +1152,12 @@ def startup_india(data):
             time.sleep(2)
             checkbox = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[contains(@class,'ant-checkbox-inner')]")))
             driver.execute_script("arguments[0].click();", checkbox)
-            input("Press Enter to close browser...to final submit")
+            log.info("Auto-proceeding: Final Submit")
             submit_btn = driver.find_element(By.XPATH, "//button[normalize-space()='Submit Application']")
             print(submit_btn.is_enabled())            
             submit_btn.click()
             time.sleep(5)
-            input("Press Enter to close browser...to after final submit")
+            log.info("Auto-proceeding: After Final Submit")
             driver.find_element(By.CLASS_NAME, "sumbit-ok").click()
             time.sleep(5)
 

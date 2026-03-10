@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>OTP Verification — Startup India</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2236;
+    --border: #2a3550;
+    --accent: #f97316;
+    --text: #e8eaf0;
+    --muted: #6b7a99;
+    --success: #22c55e;
+    --error: #ef4444;
+    --warning: #eab308;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 24px;
+    background-image:
+      radial-gradient(ellipse at 20% 20%, rgba(249,115,22,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(59,130,246,0.06) 0%, transparent 50%);
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px;
+    width: 100%; max-width: 460px;
+    position: relative; overflow: hidden;
+  }
+  .card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--accent), #ef4444);
+  }
+
+  .back-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    color: var(--muted); font-size: 13px; text-decoration: none;
+    margin-bottom: 28px; transition: color 0.2s;
+  }
+  .back-link:hover { color: var(--accent); }
+
+  .icon-wrap {
+    width: 56px; height: 56px; border-radius: 16px;
+    background: rgba(249,115,22,0.12);
+    border: 1px solid rgba(249,115,22,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; margin-bottom: 20px;
+  }
+
+  h1 { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+  .subtitle { color: var(--muted); font-size: 13px; line-height: 1.6; margin-bottom: 28px; }
+
+  /* Status indicator */
+  .status-bar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px; border-radius: 10px;
+    margin-bottom: 24px; font-size: 13px; font-weight: 500;
+    transition: all 0.3s;
+  }
+  .status-bar.waiting {
+    background: rgba(234,179,8,0.1); border: 1px solid rgba(234,179,8,0.2); color: var(--warning);
+  }
+  .status-bar.ready {
+    background: rgba(249,115,22,0.1); border: 1px solid rgba(249,115,22,0.25); color: var(--accent);
+  }
+  .status-bar.submitted {
+    background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2); color: var(--success);
+  }
+  .status-bar.error {
+    background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); color: var(--error);
+  }
+
+  .pulse {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: currentColor; flex-shrink: 0;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* Form */
+  .form { display: flex; flex-direction: column; gap: 16px; }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  label {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .otp-input {
+    background: var(--surface2); border: 1.5px solid var(--border);
+    border-radius: 10px; padding: 14px 16px;
+    color: var(--text); font-family: 'DM Sans', sans-serif;
+    font-size: 18px; font-weight: 600; letter-spacing: 0.2em;
+    text-align: center; outline: none; width: 100%;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .otp-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(249,115,22,0.15);
+  }
+  .otp-input:disabled {
+    opacity: 0.4; cursor: not-allowed;
+  }
+
+  .submit-btn {
+    width: 100%; padding: 15px;
+    background: linear-gradient(135deg, var(--accent), #ef4444);
+    border: none; border-radius: 12px;
+    color: #fff; font-family: 'Syne', sans-serif;
+    font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 8px 24px rgba(249,115,22,0.3);
+    margin-top: 6px;
+  }
+  .submit-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(249,115,22,0.4); }
+  .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .hint { font-size: 11px; color: var(--muted); text-align: center; margin-top: 8px; line-height: 1.6; }
+
+  /* Connection dot */
+  .conn-dot {
+    position: absolute; top: 20px; right: 20px;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--muted);
+  }
+  .conn-dot.connected { background: var(--success); animation: pulse 2s ease-in-out infinite; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="conn-dot" id="connDot" title="SSE Connection"></div>
+
+  <a class="back-link" href="/">← Back to Hub</a>
+
+  <div class="icon-wrap">🔐</div>
+  <h1>OTP Verification</h1>
+  <p class="subtitle">
+    Keep this page open while the Startup India filing script is running.<br>
+    When OTP is triggered, the form below will activate automatically.
+  </p>
+
+  <div class="status-bar waiting" id="statusBar">
+    <span class="pulse"></span>
+    <span id="statusText">Waiting for script to trigger OTP...</span>
+  </div>
+
+  <div class="form">
+    <div class="field">
+      <label>Mobile OTP</label>
+      <input class="otp-input" type="text" id="mobileOtp"
+             placeholder="——————" maxlength="8" disabled
+             oninput="this.value=this.value.replace(/\D/g,'')"/>
+    </div>
+    <div class="field">
+      <label>Email OTP</label>
+      <input class="otp-input" type="text" id="emailOtp"
+             placeholder="——————" maxlength="8" disabled
+             oninput="this.value=this.value.replace(/\D/g,'')"/>
+    </div>
+    <button class="submit-btn" id="submitBtn" disabled onclick="submitOTP()">
+      Submit OTP to Script
+    </button>
+  </div>
+
+  <p class="hint" id="hintText">
+    The form will unlock automatically when the script requests OTP.<br>
+    Do not refresh this page.
+  </p>
+</div>
+
+<script>
+const statusBar  = document.getElementById('statusBar');
+const statusText = document.getElementById('statusText');
+const mobileOtp  = document.getElementById('mobileOtp');
+const emailOtp   = document.getElementById('emailOtp');
+const submitBtn  = document.getElementById('submitBtn');
+const hintText   = document.getElementById('hintText');
+const connDot    = document.getElementById('connDot');
+
+// ─── SSE Connection ───────────────────────────────────────────────────────────
+const es = new EventSource('/otp_stream');
+
+es.onopen = () => {
+  connDot.classList.add('connected');
+};
+
+es.onmessage = (e) => {
+  const msg = e.data;
+
+  if (msg === 'connected' || msg === 'heartbeat') return;
+
+  try {
+    const data = JSON.parse(msg);
+    if (data.event === 'otp_needed') {
+      // Unlock the form
+      statusBar.className = 'status-bar ready';
+      statusText.textContent = '✅ OTP requested! Enter both OTPs below.';
+      mobileOtp.disabled = false;
+      emailOtp.disabled  = false;
+      submitBtn.disabled = false;
+      mobileOtp.focus();
+      hintText.textContent = 'Check your phone and email for the OTPs sent by Startup India.';
+
+      // Visual attention — flash the card
+      document.querySelector('.card').style.boxShadow = '0 0 0 3px rgba(249,115,22,0.4)';
+      setTimeout(() => document.querySelector('.card').style.boxShadow = '', 1500);
+
+      // Browser notification
+      if (Notification.permission === 'granted') {
+        new Notification('OTP Required', { body: 'Enter your Mobile and Email OTP for Startup India filing.' });
+      } else if (Notification.permission !== 'denied') {
+        Notification.requestPermission();
+      }
+    }
+  } catch (_) {}
+};
+
+es.onerror = () => {
+  connDot.classList.remove('connected');
+  statusBar.className = 'status-bar error';
+  statusText.textContent = '⚠ Connection lost. Reconnecting...';
+};
+
+// ─── Submit OTP ───────────────────────────────────────────────────────────────
+async function submitOTP() {
+  const mobile = mobileOtp.value.trim();
+  const email  = emailOtp.value.trim();
+
+  if (!mobile || !email) {
+    statusBar.className = 'status-bar error';
+    statusText.textContent = '❌ Please enter both Mobile OTP and Email OTP.';
+    return;
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = '⏳ Submitting...';
+
+  try {
+    const res = await fetch('/otp_submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mobile_otp: mobile, email_otp: email })
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      statusBar.className = 'status-bar submitted';
+      statusText.textContent = '✅ OTP submitted! Script is continuing...';
+      mobileOtp.disabled = true;
+      emailOtp.disabled  = true;
+      hintText.textContent = 'OTP has been sent to the script. You can close this page.';
+      mobileOtp.value = '';
+      emailOtp.value  = '';
+    } else {
+      throw new Error(data.message || 'Submission failed');
+    }
+  } catch (err) {
+    statusBar.className = 'status-bar error';
+    statusText.textContent = `❌ Error: ${err.message}`;
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Submit OTP to Script';
+  }
+}
+
+// Allow Enter key to submit
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !submitBtn.disabled) submitOTP();
+});
+</script>
+</body>
+</html>
