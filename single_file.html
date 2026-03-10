@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Base64 Converter</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f0ece4;
+    --card: #faf8f4;
+    --card2: #ffffff;
+    --accent: #e8552d;
+    --accent2: #2d6be8;
+    --ink: #1a1612;
+    --ink2: #6b6259;
+    --border: #e2ddd6;
+    --success: #2dae6e;
+    --radius: 18px;
+    --mono: 'DM Mono', monospace;
+    --sans: 'Syne', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 32px 16px 64px;
+    background-image:
+      radial-gradient(circle at 15% 10%, rgba(232,85,45,0.08) 0%, transparent 45%),
+      radial-gradient(circle at 85% 80%, rgba(45,107,232,0.07) 0%, transparent 45%);
+  }
+
+  /* ── HEADER ── */
+  .header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  .header-badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--ink); color: #fff;
+    font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+    padding: 5px 14px; border-radius: 999px; margin-bottom: 18px;
+  }
+  .header h1 {
+    font-size: clamp(2rem, 6vw, 3.4rem); font-weight: 800; line-height: 1.1;
+    letter-spacing: -0.03em;
+  }
+  .header h1 span { color: var(--accent); }
+  .header p { margin-top: 10px; color: var(--ink2); font-size: 1rem; }
+
+  /* ── LAYOUT ── */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+  @media (max-width: 780px) { .grid { grid-template-columns: 1fr; } }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    display: flex; flex-direction: column; gap: 20px;
+  }
+
+  .card-header {
+    display: flex; align-items: center; gap: 12px;
+    padding-bottom: 18px;
+    border-bottom: 1.5px solid var(--border);
+  }
+  .card-icon {
+    width: 42px; height: 42px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+  }
+  .card-icon.upload { background: rgba(232,85,45,0.12); }
+  .card-icon.download { background: rgba(45,107,232,0.12); }
+  .card-title { font-size: 1.15rem; font-weight: 700; }
+  .card-sub { font-size: .8rem; color: var(--ink2); margin-top: 2px; }
+
+  /* ── DROP ZONE ── */
+  .drop-zone {
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 36px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all .2s;
+    position: relative;
+  }
+  .drop-zone:hover, .drop-zone.drag-over {
+    border-color: var(--accent);
+    background: rgba(232,85,45,0.04);
+  }
+  .drop-zone input[type=file] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+  .drop-icon { font-size: 36px; margin-bottom: 10px; }
+  .drop-zone p { font-size: .88rem; color: var(--ink2); line-height: 1.6; }
+  .drop-zone strong { color: var(--accent); }
+
+  /* ── FILE INFO ── */
+  .file-info {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--bg); border-radius: 10px; padding: 10px 14px;
+    font-size: .82rem; color: var(--ink2);
+  }
+  .file-info .fi-icon { font-size: 20px; }
+  .file-info .fi-name { font-weight: 600; color: var(--ink); font-family: var(--mono); font-size: .8rem; }
+  .file-info .fi-size { margin-left: auto; background: var(--border); border-radius: 6px; padding: 2px 8px; font-family: var(--mono); }
+
+  /* ── IMAGE PREVIEW ── */
+  .preview-wrap {
+    border-radius: 10px; overflow: hidden;
+    border: 1.5px solid var(--border);
+    max-height: 180px;
+    display: flex; align-items: center; justify-content: center;
+    background: #f5f5f0;
+  }
+  .preview-wrap img { max-height: 180px; max-width: 100%; object-fit: contain; }
+  .preview-wrap a {
+    font-size: .85rem; color: var(--accent2); text-decoration: none; font-weight: 600;
+    padding: 12px; display: flex; align-items: center; gap: 6px;
+  }
+  .preview-wrap a:hover { text-decoration: underline; }
+
+  /* ── TEXTAREA ── */
+  textarea {
+    width: 100%; border-radius: 10px; border: 1.5px solid var(--border);
+    background: var(--card2); color: var(--ink);
+    font-family: var(--mono); font-size: .75rem; line-height: 1.6;
+    padding: 12px 14px; resize: vertical; outline: none;
+    transition: border-color .2s;
+    min-height: 120px;
+  }
+  textarea:focus { border-color: var(--accent); }
+  textarea::placeholder { color: #bbb; }
+
+  /* ── COUNT ── */
+  .char-count {
+    font-family: var(--mono); font-size: .73rem; color: var(--ink2);
+    text-align: right; margin-top: -12px;
+  }
+  .char-count span { color: var(--ink); font-weight: 500; }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 11px 20px; border-radius: 10px;
+    font-family: var(--sans); font-size: .88rem; font-weight: 600;
+    cursor: pointer; border: none; transition: all .18s;
+    text-decoration: none;
+  }
+  .btn-accent {
+    background: var(--accent); color: #fff;
+  }
+  .btn-accent:hover { background: #cf3d1a; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(232,85,45,0.3); }
+  .btn-blue {
+    background: var(--accent2); color: #fff;
+  }
+  .btn-blue:hover { background: #1f54c4; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(45,107,232,0.3); }
+  .btn-ghost {
+    background: var(--bg); color: var(--ink); border: 1.5px solid var(--border);
+  }
+  .btn-ghost:hover { background: var(--border); }
+  .btn:active { transform: scale(0.97) !important; }
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: var(--success); color: #fff;
+    padding: 12px 24px; border-radius: 999px;
+    font-size: .88rem; font-weight: 600;
+    display: flex; align-items: center; gap: 8px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+    transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+    z-index: 999; pointer-events: none;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ── DIVIDER ── */
+  .section-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px; border-radius: 50%;
+    font-size: .7rem; font-weight: 800;
+    background: var(--accent); color: #fff; flex-shrink: 0;
+  }
+  .section-num.blue { background: var(--accent2); }
+
+  /* ── EMPTY STATE ── */
+  .empty { color: var(--ink2); font-size: .82rem; text-align: center; padding: 8px 0; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-badge">
+    <span>⚡</span> Developer Utility
+  </div>
+  <h1>Base64 <span>Converter</span></h1>
+  <p>Encode files to Base64 · Decode Base64 back to files</p>
+</header>
+
+<div class="grid">
+
+  <!-- ══ SECTION 1: File → Base64 ══ -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon upload">📁</div>
+      <div>
+        <div class="card-title" style="display:flex;align-items:center;gap:8px;">
+          <span class="section-num">1</span> File to Base64
+        </div>
+        <div class="card-sub">Upload a file and get its Base64 string</div>
+      </div>
+    </div>
+
+    <!-- Drop Zone -->
+    <div class="drop-zone" id="dropZone">
+      <input type="file" id="fileInput" accept=".png,.jpg,.jpeg,.pdf,.gif,.webp,.svg,.txt,.json" />
+      <div class="drop-icon">☁️</div>
+      <p><strong>Click to upload</strong> or drag & drop<br/>PNG, JPG, PDF, and more</p>
+    </div>
+
+    <!-- File Info -->
+    <div id="fileInfo" style="display:none" class="file-info">
+      <span class="fi-icon" id="fileTypeIcon">📄</span>
+      <div>
+        <div class="fi-name" id="fileName">—</div>
+        <div style="font-size:.75rem;margin-top:1px;">File info</div>
+      </div>
+      <span class="fi-size" id="fileSize">—</span>
+    </div>
+
+    <!-- Image Preview -->
+    <div id="previewWrap" class="preview-wrap" style="display:none;"></div>
+
+    <!-- Base64 Output -->
+    <div>
+      <textarea id="b64Output" rows="5" placeholder="Base64 output will appear here…" readonly></textarea>
+      <div class="char-count">Characters: <span id="charCount">0</span></div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="btn-row">
+      <button class="btn btn-accent" onclick="copyBase64()">
+        <span>📋</span> Copy Base64
+      </button>
+      <button class="btn btn-ghost" onclick="clearEncoder()">
+        <span>✕</span> Clear
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ SECTION 2: Base64 → File ══ -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon download">💾</div>
+      <div>
+        <div class="card-title" style="display:flex;align-items:center;gap:8px;">
+          <span class="section-num blue">2</span> Base64 to File
+        </div>
+        <div class="card-sub">Paste Base64 and download the file</div>
+      </div>
+    </div>
+
+    <!-- Input -->
+    <div>
+      <textarea id="b64Input" rows="8" placeholder="Paste Base64 string here…&#10;&#10;Supports data URIs too:&#10;data:image/png;base64,iVBOR…" oninput="onB64Input()"></textarea>
+      <div class="char-count">Characters: <span id="inputCharCount">0</span></div>
+    </div>
+
+    <!-- Detected type -->
+    <div id="detectedType" style="display:none;" class="file-info">
+      <span class="fi-icon" id="detectedIcon">🔍</span>
+      <div>
+        <div class="fi-name" id="detectedMime">Unknown</div>
+        <div style="font-size:.75rem;margin-top:1px;">Auto-detected type</div>
+      </div>
+      <span class="fi-size" id="detectedExt">.bin</span>
+    </div>
+
+    <!-- Decoded preview -->
+    <div id="decodePreviewWrap" class="preview-wrap" style="display:none;"></div>
+
+    <!-- Spacer to push buttons down -->
+    <div style="flex:1"></div>
+
+    <!-- Buttons -->
+    <div class="btn-row">
+      <button class="btn btn-blue" onclick="downloadFile()">
+        <span>⬇️</span> Download File
+      </button>
+      <button class="btn btn-ghost" onclick="clearDecoder()">
+        <span>✕</span> Clear
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">✅ Copied to clipboard!</div>
+
+<script>
+// ── Helpers ──────────────────────────────────────────────────
+function fmtSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1048576) return (bytes/1024).toFixed(1) + ' KB';
+  return (bytes/1048576).toFixed(2) + ' MB';
+}
+
+function typeIcon(mime) {
+  if (!mime) return '📄';
+  if (mime.startsWith('image/')) return '🖼️';
+  if (mime === 'application/pdf') return '📕';
+  if (mime.startsWith('text/')) return '📝';
+  if (mime.includes('json')) return '🗂️';
+  return '📦';
+}
+
+function mimeToExt(mime) {
+  const map = {
+    'image/png':'png','image/jpeg':'jpg','image/gif':'gif',
+    'image/webp':'webp','image/svg+xml':'svg',
+    'application/pdf':'pdf','text/plain':'txt',
+    'application/json':'json','application/octet-stream':'bin'
+  };
+  return map[mime] || 'bin';
+}
+
+function detectMime(b64) {
+  // check for data URI
+  const m = b64.match(/^data:([^;]+);base64,/i);
+  if (m) return m[1];
+  // detect by magic bytes
+  const head = b64.substring(0,12);
+  try {
+    const raw = atob(head.replace(/[^A-Za-z0-9+/=]/g,'').padEnd(Math.ceil(head.length/4)*4,'='));
+    const bytes = [...raw].map(c=>c.charCodeAt(0));
+    if (bytes[0]===0x89&&bytes[1]===0x50) return 'image/png';
+    if (bytes[0]===0xFF&&bytes[1]===0xD8) return 'image/jpeg';
+    if (bytes[0]===0x47&&bytes[1]===0x49) return 'image/gif';
+    if (bytes[0]===0x25&&bytes[1]===0x50) return 'application/pdf';
+    if (bytes[0]===0x52&&bytes[1]===0x49) return 'image/webp';
+    const s = raw.substring(0,5);
+    if (s.includes('{') || s.includes('[')) return 'application/json';
+  } catch(e){}
+  return 'application/octet-stream';
+}
+
+function stripDataUri(b64) {
+  return b64.replace(/^data:[^;]+;base64,/i,'').trim();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = '✅ ' + msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2400);
+}
+
+// ── SECTION 1 ────────────────────────────────────────────────
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  const f = e.dataTransfer.files[0];
+  if (f) processFile(f);
+});
+fileInput.addEventListener('change', e => {
+  if (e.target.files[0]) processFile(e.target.files[0]);
+});
+
+function processFile(file) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dataUri = e.target.result;
+    const b64 = dataUri.split(',')[1];
+    document.getElementById('b64Output').value = dataUri;
+    document.getElementById('charCount').textContent = dataUri.length.toLocaleString();
+
+    // file info
+    document.getElementById('fileInfo').style.display = 'flex';
+    document.getElementById('fileTypeIcon').textContent = typeIcon(file.type);
+    document.getElementById('fileName').textContent = file.name;
+    document.getElementById('fileSize').textContent = fmtSize(file.size);
+
+    // preview
+    const pw = document.getElementById('previewWrap');
+    pw.innerHTML = '';
+    if (file.type.startsWith('image/')) {
+      pw.style.display = 'flex';
+      const img = document.createElement('img');
+      img.src = dataUri;
+      pw.appendChild(img);
+    } else if (file.type === 'application/pdf') {
+      pw.style.display = 'flex';
+      const a = document.createElement('a');
+      a.href = dataUri;
+      a.target = '_blank';
+      a.innerHTML = '📕 Open PDF Preview ↗';
+      pw.appendChild(a);
+    } else {
+      pw.style.display = 'none';
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function copyBase64() {
+  const val = document.getElementById('b64Output').value;
+  if (!val) return;
+  navigator.clipboard.writeText(val).then(() => showToast('Copied to clipboard!')).catch(() => {
+    document.getElementById('b64Output').select();
+    document.execCommand('copy');
+    showToast('Copied!');
+  });
+}
+
+function clearEncoder() {
+  document.getElementById('b64Output').value = '';
+  document.getElementById('charCount').textContent = '0';
+  document.getElementById('fileInfo').style.display = 'none';
+  document.getElementById('previewWrap').style.display = 'none';
+  document.getElementById('previewWrap').innerHTML = '';
+  fileInput.value = '';
+}
+
+// ── SECTION 2 ────────────────────────────────────────────────
+function onB64Input() {
+  const raw = document.getElementById('b64Input').value.trim();
+  document.getElementById('inputCharCount').textContent = raw.length.toLocaleString();
+  const dw = document.getElementById('decodePreviewWrap');
+
+  if (!raw) {
+    document.getElementById('detectedType').style.display = 'none';
+    dw.style.display = 'none'; dw.innerHTML = '';
+    return;
+  }
+
+  const mime = detectMime(raw);
+  const ext = mimeToExt(mime);
+  document.getElementById('detectedType').style.display = 'flex';
+  document.getElementById('detectedIcon').textContent = typeIcon(mime);
+  document.getElementById('detectedMime').textContent = mime;
+  document.getElementById('detectedExt').textContent = '.' + ext;
+
+  // live preview
+  dw.innerHTML = '';
+  const b64clean = raw.match(/^data:/) ? raw : `data:${mime};base64,${stripDataUri(raw)}`;
+  if (mime.startsWith('image/')) {
+    dw.style.display = 'flex';
+    const img = document.createElement('img');
+    img.src = b64clean;
+    img.onerror = () => { dw.style.display='none'; };
+    dw.appendChild(img);
+  } else if (mime === 'application/pdf') {
+    dw.style.display = 'flex';
+    const a = document.createElement('a');
+    a.href = b64clean;
+    a.target = '_blank';
+    a.innerHTML = '📕 Preview PDF ↗';
+    dw.appendChild(a);
+  } else {
+    dw.style.display = 'none';
+  }
+}
+
+function downloadFile() {
+  const raw = document.getElementById('b64Input').value.trim();
+  if (!raw) { showToast('Paste Base64 first!'); return; }
+
+  const mime = detectMime(raw);
+  const ext = mimeToExt(mime);
+  const b64clean = stripDataUri(raw);
+
+  try {
+    const binary = atob(b64clean);
+    const bytes = new Uint8Array(binary.length);
+    for (let i=0; i<binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    const blob = new Blob([bytes], {type: mime});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `decoded-file.${ext}`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('File downloaded!');
+  } catch(e) {
+    showToast('Invalid Base64 string');
+  }
+}
+
+function clearDecoder() {
+  document.getElementById('b64Input').value = '';
+  document.getElementById('inputCharCount').textContent = '0';
+  document.getElementById('detectedType').style.display = 'none';
+  document.getElementById('decodePreviewWrap').style.display = 'none';
+  document.getElementById('decodePreviewWrap').innerHTML = '';
+}
+</script>
+</body>
+</html>

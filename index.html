@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Base64 Tools — Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f0ece4;
+    --card: #faf8f4;
+    --accent: #e8552d;
+    --accent2: #2d6be8;
+    --accent3: #2dae6e;
+    --accent4: #f97316;
+    --ink: #1a1612;
+    --ink2: #6b6259;
+    --border: #e2ddd6;
+    --radius: 20px;
+    --mono: 'DM Mono', monospace;
+    --sans: 'Syne', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px 64px;
+    background-image:
+      radial-gradient(circle at 15% 10%, rgba(232,85,45,0.09) 0%, transparent 45%),
+      radial-gradient(circle at 85% 80%, rgba(45,107,232,0.08) 0%, transparent 45%),
+      radial-gradient(circle at 50% 55%, rgba(45,174,110,0.06) 0%, transparent 40%);
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 56px;
+  }
+  .header-badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--ink); color: #fff;
+    font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+    padding: 5px 14px; border-radius: 999px; margin-bottom: 18px;
+  }
+  .header h1 {
+    font-size: clamp(2.2rem, 6vw, 3.8rem);
+    font-weight: 800; line-height: 1.1; letter-spacing: -0.03em;
+  }
+  .header h1 span { color: var(--accent); }
+  .header p { margin-top: 12px; color: var(--ink2); font-size: 1rem; max-width: 480px; margin-inline: auto; line-height: 1.6; }
+
+  /* ── GRID ── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    max-width: 1160px;
+    width: 100%;
+  }
+  @media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 520px) { .grid { grid-template-columns: 1fr; } }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px 28px 28px;
+    box-shadow: 0 4px 28px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+    display: flex; flex-direction: column; gap: 16px;
+    text-decoration: none; color: inherit;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: transform .2s, box-shadow .2s, border-color .2s;
+  }
+  .card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 4px;
+    border-radius: var(--radius) var(--radius) 0 0;
+    transition: height .2s;
+  }
+  .card.red::before  { background: var(--accent); }
+  .card.blue::before { background: var(--accent2); }
+  .card.green::before { background: var(--accent3); }
+  .card.orange::before { background: var(--accent4); }
+
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+  }
+  .card.red:hover   { border-color: var(--accent); }
+  .card.blue:hover  { border-color: var(--accent2); }
+  .card.green:hover { border-color: var(--accent3); }
+  .card.orange:hover { border-color: var(--accent4); }
+
+  .card-icon {
+    width: 52px; height: 52px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; flex-shrink: 0;
+  }
+  .card.red  .card-icon { background: rgba(232,85,45,0.12); }
+  .card.blue .card-icon { background: rgba(45,107,232,0.12); }
+  .card.green .card-icon { background: rgba(45,174,110,0.12); }
+  .card.orange .card-icon { background: rgba(249,115,22,0.12); }
+
+  .card-title {
+    font-size: 1.2rem; font-weight: 700; letter-spacing: -0.02em;
+  }
+  .card-desc {
+    font-size: .85rem; color: var(--ink2); line-height: 1.6; flex: 1;
+  }
+
+  .card-tag {
+    display: inline-flex; align-items: center;
+    font-size: .72rem; font-weight: 600; font-family: var(--mono);
+    padding: 3px 10px; border-radius: 999px;
+    letter-spacing: .04em;
+    align-self: flex-start;
+    margin-top: 4px;
+  }
+  .card.red  .card-tag { background: rgba(232,85,45,0.1); color: var(--accent); }
+  .card.blue .card-tag { background: rgba(45,107,232,0.1); color: var(--accent2); }
+  .card.green .card-tag { background: rgba(45,174,110,0.1); color: var(--accent3); }
+  .card.orange .card-tag { background: rgba(249,115,22,0.1); color: var(--accent4); }
+
+  .arrow {
+    position: absolute; bottom: 24px; right: 24px;
+    font-size: 1.2rem; opacity: 0;
+    transform: translate(-4px, 4px);
+    transition: opacity .2s, transform .2s;
+  }
+  .card:hover .arrow { opacity: 1; transform: translate(0, 0); }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 48px;
+    font-size: .78rem; color: var(--ink2);
+    font-family: var(--mono); text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-badge">
+    <span>⚡</span> Developer Utilities
+  </div>
+  <h1>Base64 <span>Tools</span></h1>
+  <p>A collection of utilities to encode, decode, and manage Base64 files with ease.</p>
+</header>
+
+<div class="grid">
+
+  <!-- Single File -->
+  <a class="card red" href="single_file.html">
+    <div class="card-icon">📁</div>
+    <div class="card-title">Single File</div>
+    <div class="card-desc">Upload one file and convert it to a Base64 string, or decode a Base64 string back to a downloadable file.</div>
+    <span class="card-tag">Encode · Decode</span>
+    <span class="arrow">→</span>
+  </a>
+
+  <!-- All Base File -->
+  <a class="card blue" href="allbasefile.html">
+    <div class="card-icon">🗂️</div>
+    <div class="card-title">All Base File</div>
+    <div class="card-desc">View and manage all previously encoded Base64 files in one organised place for quick access and reference.</div>
+    <span class="card-tag">Browse · Manage</span>
+    <span class="arrow">→</span>
+  </a>
+
+  <!-- Multiple Files -->
+  <a class="card green" href="multiplefiles.html">
+    <div class="card-icon">📦</div>
+    <div class="card-title">Multiple Files</div>
+    <div class="card-desc">Upload multiple PDF, PNG, JPG, or JPEG files at once. Each file is encoded to Base64 and displayed as a live preview on the page.</div>
+    <span class="card-tag">PDF · PNG · JPG · JPEG</span>
+    <span class="arrow">→</span>
+  </a>
+
+  <!-- Startup India Form -->
+  <a class="card orange" href="startup_india_form.html">
+    <div class="card-icon">🚀</div>
+    <div class="card-title">Startup India</div>
+    <div class="card-desc">Complete the Startup India registration form with all required details to get your startup officially recognised.</div>
+    <span class="card-tag">Registration · Form</span>
+    <span class="arrow">→</span>
+  </a>
+
+</div>
+
+<div class="footer">Base64 Tools Suite &nbsp;·&nbsp; 4 utilities available</div>
+
+</body>
+</html>

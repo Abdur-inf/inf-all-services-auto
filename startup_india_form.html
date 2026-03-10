@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Startup India — Registration Form</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2236;
+    --border: #2a3550;
+    --accent: #f97316;
+    --accent2: #fb923c;
+    --text: #e8eaf0;
+    --muted: #6b7a99;
+    --success: #22c55e;
+    --error: #ef4444;
+    --warning: #eab308;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    min-height: 100vh;
+    background-image: radial-gradient(ellipse at 20% 20%, rgba(249,115,22,0.08) 0%, transparent 50%),
+                      radial-gradient(ellipse at 80% 80%, rgba(59,130,246,0.06) 0%, transparent 50%);
+  }
+
+  header {
+    background: linear-gradient(135deg, #0d1321 0%, #1a2236 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 28px 40px;
+    display: flex; align-items: center; gap: 18px;
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: blur(10px);
+  }
+
+  .logo-mark {
+    width: 44px; height: 44px;
+    background: linear-gradient(135deg, var(--accent), #ef4444);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18px; color: #fff;
+  }
+
+  header h1 { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; }
+  header h1 span { color: var(--accent); }
+  header p { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  .progress-bar { 
+    height: 3px; background: var(--border);
+    position: fixed; top: 0; left: 0; width: 100%; z-index: 200;
+  }
+  .progress-fill {
+    height: 100%; background: linear-gradient(90deg, var(--accent), #ef4444);
+    width: 0%; transition: width 0.4s ease;
+  }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .section::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px; font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 6px;
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .section-title .num {
+    width: 26px; height: 26px;
+    background: rgba(249,115,22,0.15);
+    border: 1px solid rgba(249,115,22,0.3);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+  }
+
+  .section-desc { color: var(--muted); font-size: 12px; margin-bottom: 24px; }
+
+  .grid { display: grid; gap: 18px; }
+  .grid-2 { grid-template-columns: 1fr 1fr; }
+  .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+  @media (max-width: 640px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    header { padding: 20px; }
+  }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+
+  label {
+    font-size: 12px; font-weight: 500;
+    color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase;
+  }
+
+  label .req { color: var(--accent); margin-left: 2px; }
+
+  input, select, textarea {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    width: 100%;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    -webkit-appearance: none;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(249,115,22,0.12);
+  }
+
+  input.error, select.error, textarea.error { border-color: var(--error); }
+  input.valid, select.valid, textarea.valid { border-color: var(--success); }
+
+  select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236b7a99' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
+
+  textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
+
+  .char-count {
+    font-size: 11px; text-align: right;
+    color: var(--muted);
+  }
+
+  .field-error { font-size: 11px; color: var(--error); display: none; }
+  .field-error.show { display: block; }
+
+  /* Password toggle */
+  .pw-wrapper { position: relative; }
+  .pw-wrapper input { padding-right: 44px; }
+  .pw-toggle {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; cursor: pointer;
+    color: var(--muted); padding: 4px; line-height: 1;
+    transition: color 0.2s; display: flex; align-items: center;
+  }
+  .pw-toggle:hover { color: var(--accent); }
+
+  /* Multi-select */
+  .multi-select-wrapper { position: relative; }
+  .multi-select-display {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    cursor: pointer; min-height: 46px;
+    display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .multi-select-display:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(249,115,22,0.12); }
+  .multi-select-display.open { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(249,115,22,0.12); border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+
+  .tag {
+    background: rgba(249,115,22,0.15);
+    border: 1px solid rgba(249,115,22,0.3);
+    color: var(--accent2);
+    padding: 3px 10px 3px 8px;
+    border-radius: 6px; font-size: 12px;
+    display: flex; align-items: center; gap: 5px;
+  }
+
+  .tag-remove { cursor: pointer; opacity: 0.6; transition: opacity 0.15s; font-size: 14px; line-height: 1; }
+  .tag-remove:hover { opacity: 1; }
+
+  .multi-placeholder { color: var(--muted); font-size: 13px; }
+
+  .multi-dropdown {
+    position: relative; top: 0; left: 0; right: 0;
+    background: var(--surface2);
+    border: 1px solid var(--accent);
+    border-top: none;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    z-index: 10;
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+
+  .multi-dropdown.open { max-height: 280px; overflow-y: auto; }
+
+  .multi-option {
+    padding: 10px 14px; cursor: pointer;
+    display: flex; align-items: center; gap: 10px;
+    transition: background 0.15s;
+    font-size: 13px;
+  }
+  .multi-option:hover { background: var(--surface2); }
+  .multi-option.selected { color: var(--accent); }
+
+  .checkbox {
+    width: 16px; height: 16px;
+    border: 1.5px solid var(--border); border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: all 0.15s;
+  }
+  .multi-option.selected .checkbox {
+    background: var(--accent); border-color: var(--accent);
+  }
+  .checkbox::after { content: '✓'; font-size: 10px; color: #fff; opacity: 0; transition: opacity 0.15s; }
+  .multi-option.selected .checkbox::after { opacity: 1; }
+
+  /* Stage pills */
+  .stage-group { display: flex; gap: 10px; flex-wrap: wrap; }
+  .stage-pill {
+    padding: 8px 18px; border-radius: 100px;
+    border: 1.5px solid var(--border);
+    cursor: pointer; font-size: 13px; font-weight: 500;
+    transition: all 0.2s; color: var(--muted);
+    background: var(--surface2);
+  }
+  .stage-pill:hover { border-color: var(--accent); color: var(--accent); }
+  .stage-pill.active {
+    background: linear-gradient(135deg, var(--accent), #ef4444);
+    border-color: transparent; color: #fff;
+    box-shadow: 0 4px 14px rgba(249,115,22,0.35);
+  }
+
+  /* Directors */
+  .directors-list { display: flex; flex-direction: column; gap: 16px; margin-bottom: 16px; }
+
+  .director-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px;
+    position: relative;
+    animation: slideIn 0.3s ease;
+  }
+
+  @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .director-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .director-num {
+    font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700;
+    color: var(--accent);
+  }
+
+  .remove-director {
+    background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2);
+    color: var(--error); padding: 5px 12px; border-radius: 6px;
+    cursor: pointer; font-size: 12px; font-weight: 500;
+    transition: all 0.2s;
+  }
+  .remove-director:hover { background: rgba(239,68,68,0.2); }
+
+  .gender-group { display: flex; gap: 10px; }
+  .gender-pill {
+    flex: 1; padding: 10px; text-align: center;
+    border: 1.5px solid var(--border); border-radius: 8px;
+    cursor: pointer; font-size: 13px; transition: all 0.2s;
+    color: var(--muted); background: var(--surface);
+  }
+  .gender-pill.active { border-color: var(--accent); color: var(--accent); background: rgba(249,115,22,0.08); }
+
+  /* File upload */
+  .file-upload {
+    border: 1.5px dashed var(--border);
+    border-radius: 10px; padding: 18px;
+    text-align: center; cursor: pointer;
+    transition: all 0.2s; position: relative;
+    background: var(--surface2);
+  }
+  .file-upload:hover { border-color: var(--accent); background: rgba(249,115,22,0.04); }
+  .file-upload input[type="file"] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+  .file-upload-icon { font-size: 24px; margin-bottom: 6px; }
+  .file-upload p { font-size: 12px; color: var(--muted); }
+  .file-upload .file-name { color: var(--success); font-size: 12px; margin-top: 4px; font-weight: 500; }
+  .file-upload.uploaded { border-color: var(--success); background: rgba(34,197,94,0.05); }
+
+  /* Buttons */
+  .add-director-btn {
+    width: 100%; padding: 13px;
+    border: 1.5px dashed rgba(249,115,22,0.4);
+    border-radius: 10px; background: rgba(249,115,22,0.05);
+    color: var(--accent); font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .add-director-btn:hover { border-color: var(--accent); background: rgba(249,115,22,0.1); }
+
+  .generate-btn {
+    width: 100%; padding: 16px;
+    background: linear-gradient(135deg, var(--accent), #ef4444);
+    border: none; border-radius: 12px;
+    color: #fff; font-family: 'Syne', sans-serif;
+    font-size: 16px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 8px 30px rgba(249,115,22,0.3);
+    letter-spacing: 0.02em;
+  }
+  .generate-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(249,115,22,0.4); }
+  .generate-btn:active { transform: translateY(0); }
+
+  /* Preview */
+  .preview-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px; padding: 28px;
+    margin-top: 24px; display: none;
+  }
+  .preview-section.show { display: block; animation: slideIn 0.4s ease; }
+  .preview-title {
+    font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700;
+    color: var(--success); margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .preview-code {
+    background: #06080f; border-radius: 10px; padding: 20px;
+    overflow-x: auto; font-family: 'Courier New', monospace;
+    font-size: 12px; line-height: 1.7; color: #a8b4c8;
+    max-height: 400px; overflow-y: auto;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  .download-btn {
+    margin-top: 16px; padding: 12px 28px;
+    background: var(--success); border: none; border-radius: 10px;
+    color: #fff; font-family: 'Syne', sans-serif;
+    font-size: 14px; font-weight: 700; cursor: pointer;
+    transition: all 0.2s; display: flex; align-items: center; gap: 8px;
+  }
+  .download-btn:hover { background: #16a34a; transform: translateY(-1px); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+<header>
+  <div class="logo-mark">SI</div>
+  <div>
+    <h1>Startup <span>India</span></h1>
+    <p>Registration Form Generator</p>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- Section 1: Company Address -->
+  <div class="section">
+    <div class="section-title"><span class="num">1</span> Company Address</div>
+    <p class="section-desc">Registered address of your company</p>
+    <div class="grid grid-2">
+      <div class="field">
+        <label>Address Line 1 <span class="req">*</span></label>
+        <input type="text" id="address1" placeholder="Street address" oninput="updateProgress()">
+        <span class="field-error" id="err-address1">This field is required</span>
+      </div>
+      <div class="field">
+        <label>Address Line 2</label>
+        <input type="text" id="address2" placeholder="Apartment, suite, etc.">
+      </div>
+      <div class="field">
+        <label>State <span class="req">*</span></label>
+        <input type="text" id="state" placeholder="e.g. Tamil Nadu" oninput="updateProgress()">
+        <span class="field-error" id="err-state">This field is required</span>
+      </div>
+      <div class="field">
+        <label>District <span class="req">*</span></label>
+        <input type="text" id="district" placeholder="e.g. Thanjavur" oninput="updateProgress()">
+        <span class="field-error" id="err-district">This field is required</span>
+      </div>
+      <div class="field">
+        <label>City <span class="req">*</span></label>
+        <input type="text" id="city" placeholder="e.g. Kumbakonam" oninput="updateProgress()">
+        <span class="field-error" id="err-city">This field is required</span>
+      </div>
+      <div class="field">
+        <label>Pincode <span class="req">*</span></label>
+        <input type="text" id="pincode" placeholder="6-digit pincode" maxlength="6" oninput="updateProgress()">
+        <span class="field-error" id="err-pincode">Enter a valid 6-digit pincode</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 2: Login Details -->
+  <div class="section">
+    <div class="section-title"><span class="num">2</span> Login & Contact Details</div>
+    <p class="section-desc">Account credentials and primary contact</p>
+    <div class="grid grid-2">
+      <div class="field">
+        <label>Username (Email) <span class="req">*</span></label>
+        <input type="email" id="username" placeholder="email@example.com" oninput="updateProgress()">
+        <span class="field-error" id="err-username">Enter a valid email</span>
+      </div>
+      <div class="field">
+        <label>Mobile Number <span class="req">*</span></label>
+        <input type="tel" id="mobile_no" placeholder="10-digit number" maxlength="10" oninput="updateProgress()">
+        <span class="field-error" id="err-mobile_no">Enter a valid 10-digit number</span>
+      </div>
+      <div class="field">
+        <label>Password <span class="req">*</span></label>
+        <div class="pw-wrapper">
+          <input type="password" id="password" value="India@123" oninput="updateProgress()">
+          <button class="pw-toggle" type="button" onclick="togglePassword(this)" tabindex="-1" title="Show/hide password">
+            <svg id="eye-show" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg id="eye-hide" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+          </button>
+        </div>
+        <span class="field-error" id="err-password">Password is required</span>
+      </div>
+      <div class="field">
+        <label>Website</label>
+        <input type="url" id="website" placeholder="https://yourwebsite.com">
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 3: Industry & Sector -->
+  <div class="section">
+    <div class="section-title"><span class="num">3</span> Industry & Sector</div>
+    <p class="section-desc">Select your startup's industry and relevant sector</p>
+    <div class="grid grid-2">
+      <div class="field">
+        <label>Industry <span class="req">*</span></label>
+        <select id="Industry" onchange="updateSectors(); updateProgress()">
+          <option value="">— Select Industry —</option>
+        </select>
+        <span class="field-error" id="err-Industry">Please select an industry</span>
+      </div>
+      <div class="field">
+        <label>Sector <span class="req">*</span></label>
+        <select id="Sector" oninput="updateProgress()">
+          <option value="">— Select Sector —</option>
+        </select>
+        <span class="field-error" id="err-Sector">Please select a sector</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 4: Categories -->
+  <div class="section">
+    <div class="section-title"><span class="num">4</span> Categories</div>
+    <p class="section-desc">Select all applicable categories (multi-select)</p>
+    <div class="field">
+      <label>Categories <span class="req">*</span></label>
+      <div class="multi-select-wrapper" id="catWrapper">
+        <div class="multi-select-display" id="catDisplay" tabindex="0" onclick="toggleDropdown()" onkeydown="if(event.key==='Enter'||event.key===' ')toggleDropdown()">
+          <span class="multi-placeholder" id="catPlaceholder">— Select Categories —</span>
+        </div>
+        <div class="multi-dropdown" id="catDropdown"></div>
+      </div>
+      <span class="field-error" id="err-Catogries">Please select at least one category</span>
+    </div>
+  </div>
+
+  <!-- Section 5: Stage -->
+  <div class="section">
+    <div class="section-title"><span class="num">5</span> Startup Stage</div>
+    <p class="section-desc">What stage is your startup at?</p>
+    <div class="stage-group" id="stageGroup">
+      <div class="stage-pill" onclick="selectStage(this,'Ideation')">Ideation</div>
+      <div class="stage-pill" onclick="selectStage(this,'Validation')">Validation</div>
+      <div class="stage-pill" onclick="selectStage(this,'Early traction')">Early Traction</div>
+      <div class="stage-pill" onclick="selectStage(this,'Scaling')">Scaling</div>
+    </div>
+    <span class="field-error" id="err-stage">Please select a stage</span>
+  </div>
+
+  <!-- Section 6: Company Details -->
+  <div class="section">
+    <div class="section-title"><span class="num">6</span> Company Details</div>
+    <p class="section-desc">Tell us about your startup</p>
+    <div class="grid" style="gap:20px;">
+      <div class="field">
+        <label>Problem Statement <span class="req">*</span></label>
+        <textarea id="problem_statement" placeholder="Describe the problem your startup is addressing..." oninput="countChars(this,'cc-prob',100,350)"></textarea>
+        <span class="char-count" id="cc-prob" style="display:block;text-align:right;">0 / 350</span>
+      </div>
+      <div class="field">
+        <label>About Company <span class="req">*</span></label>
+        <textarea id="aboutcompany" placeholder="Brief description of your company..." oninput="countChars(this,'cc-about',100,350)"></textarea>
+        <span class="char-count" id="cc-about" style="display:block;text-align:right;">0 / 350</span>
+      </div>
+      <div class="field">
+        <label>Who We Are <span class="req">*</span></label>
+        <textarea id="who_we_are" placeholder="Describe your team and mission..." oninput="countChars(this,'cc-who',100,350)"></textarea>
+        <span class="char-count" id="cc-who" style="display:block;text-align:right;">0 / 350</span>
+      </div>
+      <div class="field">
+        <label>Solution <span class="req">*</span></label>
+        <textarea id="solution" placeholder="What problem are you solving and how..." oninput="countChars(this,'cc-sol',100,350)"></textarea>
+        <span class="char-count" id="cc-sol" style="display:block;text-align:right;">0 / 350</span>
+      </div>
+      <div class="field">
+        <label>Uniqueness <span class="req">*</span></label>
+        <textarea id="uniqueness" placeholder="What makes you different from competitors..." oninput="countChars(this,'cc-uniq',100,350)"></textarea>
+        <span class="char-count" id="cc-uniq" style="display:block;text-align:right;">0 / 350</span>
+      </div>
+      <div class="field">
+        <label>Revenue Growth <span class="req">*</span></label>
+        <textarea id="revenue_growth" placeholder="Describe your revenue model and growth projections..." oninput="countChars(this,'cc-rev',100,350)"></textarea>
+        <span class="char-count" id="cc-rev" style="display:block;text-align:right;">0 / 350</span>
+      </div>
+      <div class="field" style="grid-column:1/-1">
+        <label>Number of Employees <span class="req">*</span></label>
+        <input type="number" id="no_of_emp" placeholder="e.g. 5" min="1" style="max-width:200px;" oninput="updateProgress()">
+        <span class="field-error" id="err-no_of_emp">Please enter number of employees</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 7: Directors -->
+  <div class="section">
+    <div class="section-title"><span class="num">7</span> Directors</div>
+    <p class="section-desc">Add directors one by one</p>
+    <div class="directors-list" id="directorsList"></div>
+    <button class="add-director-btn" onclick="addDirector()">
+      <span style="font-size:18px;">＋</span> Add Director
+    </button>
+    <span class="field-error" id="err-directors" style="margin-top:8px;">Please add at least one director</span>
+  </div>
+
+  <!-- Section 8: File Uploads -->
+  <div class="section">
+    <div class="section-title"><span class="num">8</span> Document Uploads</div>
+    <p class="section-desc">Upload required documents (converted to Base64)</p>
+    <div class="grid grid-2">
+      <div class="field">
+        <label>Company Logo <span class="req">*</span></label>
+        <div class="file-upload" id="fu-logo">
+          <input type="file" accept="image/*" onchange="handleFile(this,'lOGO_file','fu-logo','fn-logo')">
+          <div class="file-upload-icon">🖼️</div>
+          <p>Click to upload logo</p>
+          <div class="file-name" id="fn-logo"></div>
+        </div>
+        <span class="field-error" id="err-lOGO_file">Please upload company logo</span>
+      </div>
+      <div class="field">
+        <label>Letter of Authorisation (LOA) <span class="req">*</span></label>
+        <div class="file-upload" id="fu-loa">
+          <input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFile(this,'LOA_file','fu-loa','fn-loa')">
+          <div class="file-upload-icon">📄</div>
+          <p>Click to upload LOA</p>
+          <div class="file-name" id="fn-loa"></div>
+        </div>
+        <span class="field-error" id="err-LOA_file">Please upload LOA</span>
+      </div>
+      <div class="field">
+        <label>Certificate of Incorporation (COI) <span class="req">*</span></label>
+        <div class="file-upload" id="fu-coi">
+          <input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFile(this,'COI_file','fu-coi','fn-coi')">
+          <div class="file-upload-icon">📋</div>
+          <p>Click to upload COI</p>
+          <div class="file-name" id="fn-coi"></div>
+        </div>
+        <span class="field-error" id="err-COI_file">Please upload COI</span>
+      </div>
+      <div class="field">
+        <label>Pitch Deck <span class="req">*</span></label>
+        <div class="file-upload" id="fu-pitch">
+          <input type="file" accept=".pdf,.ppt,.pptx" onchange="handleFile(this,'pitchdesk_file','fu-pitch','fn-pitch')">
+          <div class="file-upload-icon">📊</div>
+          <p>Click to upload Pitch Deck</p>
+          <div class="file-name" id="fn-pitch"></div>
+        </div>
+        <span class="field-error" id="err-pitchdesk_file">Please upload pitch deck</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Generate Button -->
+  <button class="generate-btn" onclick="generateJSON()">⚡ Generate & Download JSON</button>
+
+  <!-- Preview -->
+  <div class="preview-section" id="previewSection">
+    <div class="preview-title">✅ JSON Generated Successfully</div>
+    <pre class="preview-code" id="previewCode"></pre>
+    <button class="download-btn" onclick="downloadJSON()">⬇️ Download .txt File</button>
+  </div>
+
+</div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────────
+const INDUSTRIES = [{"name":"Analytics","sectors":["Big Data","Business Intelligence","Data Science","Others"]},{"name":"Advertising","sectors":["Adtech","Online Classified","Others"]},{"name":"Architecture Interior Design","sectors":["Others"]},{"name":"AR VR (Augmented + Virtual Reality)","sectors":["Others"]},{"name":"Automotive","sectors":["Auto & Truck Manufacturers","Auto Truck & Motor Cycle Parts","Electric Vehicles","Tires And Rubber Products","Others"]},{"name":"Art & Photography","sectors":["Art","Handicraft","Photography","Others"]},{"name":"Animation","sectors":["Others"]},{"name":"Chemicals","sectors":["Agricultural Chemicals","Commodity Chemicals","Diversified Chemicals","Specialty Chemicals","Others"]},{"name":"Computer Vision","sectors":["Others"]},{"name":"Telecommunication & Networking","sectors":["Integrated Communication services","Network Technology Solutions","Wireless","Others"]},{"name":"Construction","sectors":["Construction & Engineering","Construction Materials","Construction Suppliers & Fixtures","Homebuilding","New – Age Construction Technologies","Others"]},{"name":"Agriculture","sectors":["Agri – Tech","Animal Husbandry","Dairy Farming","Fisheries","Food Processing","Horticulture","Organic Agriculture","Others"]},{"name":"Aeronautics Aerospace & defense","sectors":["Aviation & Others","Defence Equipment","Drones","Space Technology","Others"]},{"name":"AI","sectors":["Machine Learning","NLP","Others"]},{"name":"Green Technology","sectors":["Clean Tech","Waste Management","Others"]},{"name":"Events","sectors":["Events Management","Weddings","Others"]},{"name":"Fashion","sectors":["Apparel","Fan Merchandise","Fashion Technology","Jewellery","Lifestyle","Others"]},{"name":"Finance Technology","sectors":["Accounting","Billing and Invoicing","Bitcoin and Block chain","Business Finance","Crowd funding","Foreign Exchange","Insurance","Micro Finance","Mobile Wallets Payments","P2P Lending","Payment Platforms","Personal Finance","Point Of Sales","Trading","Others"]},{"name":"Enterprise Software","sectors":["CXM","Cloud","Collaboration","Customer Support","ERP","Enterprise Mobility","Location Based","SCM","Others"]},{"name":"Food And Beverage","sectors":["Food Processing","Food Technology / Food Delivery","Microbrewery","Restaurants","Others"]},{"name":"Design","sectors":["Industrial Design","Web Design","Others"]},{"name":"Dating Matrimonial","sectors":["Others"]},{"name":"Education","sectors":["Coaching","E-Learning","Education Technology","Skill Development","Others"]},{"name":"Renewable Energy","sectors":["Manufacture Of Electrical Equipment","Manufacture Of Machinery & Equipment","Renewable Energy Solutions","Renewable Nuclear Energy","Renewable Solar Energy","Renewable Wind Energy","Others"]},{"name":"Technology Hardware","sectors":["3D Printing","Electronics","Embedded","Manufacturing","Semiconductor","Others"]},{"name":"Healthcare And Life science","sectors":["Assistance Technology","Biotechnology","Health And Wellness","Healthcare IT","Healthcare Services","Healthcare Technology","Medical Devices Biomedical","Pharmaceutical","Others"]},{"name":"Internet Of Things","sectors":["Manufacturing & Warehouse","Smart Home","Wearable's","Others"]},{"name":"IT Services","sectors":["Application Development","BPO","IT Consulting","IT Management","KPO","Product Development","Project Management","Testing","Web Development","Others"]},{"name":"Human Resources","sectors":["Internships","Requirement Jobs","Skills Assessments","Talent Management","Training","Others"]},{"name":"Marketing","sectors":["Branding","Digital Marketing (SEO Automation)","Discovery","Loyalty","Market Research","Sales","Others"]},{"name":"Nanotechnology","sectors":["Others"]},{"name":"Non-renewable Energy","sectors":["Oil & Gas Drilling","Oil & Gas Exploration And Production","Oil & Gas Transportation Service","Oil Related Services And Equipment","Others"]},{"name":"Pets And Animals","sectors":["Others"]},{"name":"Media And Entertainment","sectors":["Digital Media","Digital Media Blogging","Digital Media News","Digital Media Publishing","Digital Media Video","Entertainment","Movies","OOH Media","Social Media","Others"]},{"name":"Retail","sectors":["Comparison Shopping","Retail Technology","Social Commerce","Others"]},{"name":"House – Hold Services","sectors":["Baby Care","Home Care","Laundry","Personal Care","Others"]},{"name":"Professional & Commercial Services","sectors":["Business Support Services","Business Support Supplies","Commercial Printing Services","Employment Services","Environmental Services & Equipments","Professional Information Services","Others"]},{"name":"Sports","sectors":["Fantasy Sports","Sports Promotion And Networking","Others"]},{"name":"Social Impact","sectors":["Corporate Social Responsibility","NGO","Others"]},{"name":"Social Network","sectors":["Others"]},{"name":"Textiles and Apparels","sectors":["Apparel & Accessories","Leather Footwear","Leather Textiles Goods","Non – Leather Footwear","Non – Leather Textiles Goods","Others"]},{"name":"Indic Language Startups","sectors":["E-Commerce","Education","Media And Entertainment","Natural Language Processing","Social Media","Utility Services"]},{"name":"Transportation And Storage","sectors":["Freight & Logistics Services","Passenger Transportation Services","Traffic Management","Transport Infrastructure","Others"]},{"name":"Logistics","sectors":["Others"]},{"name":"Travel And Tourisms","sectors":["Experiential Travel","Facility Management","Holiday Rentals","Hospitality","Hotel","Ticketing","Wayside Amenities","Others"]},{"name":"Security Solutions","sectors":["Cyber Security","Home Security Solutions","Public Citizen Security Solutions","Others"]},{"name":"Airport Operations","sectors":["Others"]},{"name":"Real Estate","sectors":["Co working Spaces","Housing","Others"]},{"name":"Other Specialty retailers","sectors":["Auto Vehicles Parts & Service Retailers","Computer & Electronics Retailers","Home Furnishings Retailers","Home Improvement Products & Service Retailers","Others"]},{"name":"Safety","sectors":["Personal Security","Others"]},{"name":"Robotics","sectors":["Robotics Application","Robotics Technology","Others"]},{"name":"Passenger Experience","sectors":["Others"]},{"name":"Biotechnology","sectors":["Others"]},{"name":"Waste Management","sectors":["Others"]},{"name":"Others","sectors":["Others"]},{"name":"Toys and Games","sectors":["Physical Toys And Games","Virtual Games"]}];
+
+const CATEGORIES = ["Governments","Hyperlocal","Discovery","Location Based Services","Manufacturing","Marketplace","Mobile","Offline","Online Aggregator","Peer to Peer","Platform","Consulting","Consumer Internet","Engineering","E-commerce","Others","Rental","Enterprise Mobility","Research","Sharing Economy","Social Enterprise","SaaS","Subscription Commerce"];
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let selectedCategories = [];
+let selectedStage = '';
+let directors = [];
+let fileData = {};
+let generatedJSON = null;
+let directorCount = 0;
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+window.onload = () => {
+  // Populate industry dropdown
+  const industryEl = document.getElementById('Industry');
+  INDUSTRIES.forEach(ind => {
+    const opt = document.createElement('option');
+    opt.value = ind.name; opt.textContent = ind.name;
+    industryEl.appendChild(opt);
+  });
+
+  // Populate category dropdown
+  const dropdown = document.getElementById('catDropdown');
+  CATEGORIES.forEach(cat => {
+    const div = document.createElement('div');
+    div.className = 'multi-option';
+    div.dataset.value = cat;
+    div.innerHTML = `<div class="checkbox"></div><span>${cat}</span>`;
+    div.onclick = () => toggleCategory(cat, div);
+    dropdown.appendChild(div);
+  });
+
+  // Close dropdown on outside click
+  document.addEventListener('click', (e) => {
+    if (!document.getElementById('catWrapper').contains(e.target)) {
+      document.getElementById('catDropdown').classList.remove('open');
+      document.getElementById('catDisplay').classList.remove('open');
+    }
+  });
+
+  addDirector(); // Start with 1 director
+  updateProgress();
+};
+
+// ─── INDUSTRY / SECTOR ───────────────────────────────────────────────────────
+function updateSectors() {
+  const ind = document.getElementById('Industry').value;
+  const sectorEl = document.getElementById('Sector');
+  sectorEl.innerHTML = '<option value="">— Select Sector —</option>';
+  if (!ind) return;
+  const found = INDUSTRIES.find(i => i.name === ind);
+  if (found) {
+    found.sectors.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s; opt.textContent = s;
+      sectorEl.appendChild(opt);
+    });
+  }
+}
+
+// ─── CATEGORIES ──────────────────────────────────────────────────────────────
+function toggleDropdown() {
+  const dd = document.getElementById('catDropdown');
+  const disp = document.getElementById('catDisplay');
+  dd.classList.toggle('open');
+  disp.classList.toggle('open');
+}
+
+function toggleCategory(val, el) {
+  const idx = selectedCategories.indexOf(val);
+  if (idx === -1) { selectedCategories.push(val); el.classList.add('selected'); }
+  else { selectedCategories.splice(idx, 1); el.classList.remove('selected'); }
+  renderTags();
+  updateProgress();
+}
+
+function renderTags() {
+  const disp = document.getElementById('catDisplay');
+  const ph = document.getElementById('catPlaceholder');
+  // remove existing tags
+  disp.querySelectorAll('.tag').forEach(t => t.remove());
+  if (selectedCategories.length === 0) { ph.style.display = ''; return; }
+  ph.style.display = 'none';
+  selectedCategories.forEach(v => {
+    const tag = document.createElement('div');
+    tag.className = 'tag';
+    tag.innerHTML = `${v}<span class="tag-remove" onclick="removeCategory('${v}',event)">×</span>`;
+    disp.insertBefore(tag, ph);
+  });
+}
+
+function removeCategory(val, e) {
+  e.stopPropagation();
+  selectedCategories = selectedCategories.filter(c => c !== val);
+  document.querySelectorAll('.multi-option').forEach(o => {
+    if (o.dataset.value === val) o.classList.remove('selected');
+  });
+  renderTags();
+  updateProgress();
+}
+
+// ─── STAGE ───────────────────────────────────────────────────────────────────
+function selectStage(el, val) {
+  document.querySelectorAll('.stage-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  selectedStage = val;
+  updateProgress();
+}
+
+// ─── CHAR COUNT ──────────────────────────────────────────────────────────────
+function countChars(el, counterId, min, max) {
+  const len = el.value.length;
+  const counter = document.getElementById(counterId);
+  counter.textContent = `${len} / ${max}`;
+  updateProgress();
+}
+
+// ─── DIRECTORS ───────────────────────────────────────────────────────────────
+function addDirector() {
+  directorCount++;
+  const id = Date.now();
+  directors.push({ id, Name: '', Gender: 'Male', Address: '', Mobile_no: '', Email: '' });
+  renderDirectors();
+  updateProgress();
+}
+
+function removeDirector(id) {
+  directors = directors.filter(d => d.id !== id);
+  renderDirectors();
+  updateProgress();
+}
+
+function renderDirectors() {
+  const list = document.getElementById('directorsList');
+  list.innerHTML = '';
+  directors.forEach((dir, i) => {
+    const card = document.createElement('div');
+    card.className = 'director-card';
+    card.innerHTML = `
+      <div class="director-header">
+        <div class="director-num">Director ${i + 1}</div>
+        ${directors.length > 1 ? `<button class="remove-director" onclick="removeDirector(${dir.id})">✕ Remove</button>` : ''}
+      </div>
+      <div class="grid grid-3" style="gap:14px;">
+        <div class="field" style="grid-column:1/3;">
+          <label>Full Name <span class="req">*</span></label>
+          <input type="text" value="${dir.Name}" placeholder="Full name" oninput="updateDir(${dir.id},'Name',this.value)">
+        </div>
+        <div class="field">
+          <label>Gender</label>
+          <div class="gender-group">
+            <div class="gender-pill ${dir.Gender==='Male'?'active':''}" onclick="setGender(${dir.id},'Male',this)">♂ Male</div>
+            <div class="gender-pill ${dir.Gender==='Female'?'active':''}" onclick="setGender(${dir.id},'Female',this)">♀ Female</div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Address <span class="req">*</span></label>
+          <input type="text" value="${dir.Address}" placeholder="City or full address" oninput="updateDir(${dir.id},'Address',this.value)">
+        </div>
+        <div class="field">
+          <label>Mobile Number <span class="req">*</span></label>
+          <input type="tel" value="${dir.Mobile_no}" placeholder="10-digit number" maxlength="10" oninput="updateDir(${dir.id},'Mobile_no',this.value)">
+        </div>
+        <div class="field">
+          <label>Email <span class="req">*</span></label>
+          <input type="email" value="${dir.Email}" placeholder="email@example.com" oninput="updateDir(${dir.id},'Email',this.value)">
+        </div>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+}
+
+function updateDir(id, key, val) {
+  const d = directors.find(d => d.id === id);
+  if (d) d[key] = val;
+  updateProgress();
+}
+
+function setGender(id, val, el) {
+  const d = directors.find(d => d.id === id);
+  if (d) d.Gender = val;
+  const group = el.parentElement;
+  group.querySelectorAll('.gender-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ─── FILE UPLOAD ─────────────────────────────────────────────────────────────
+function handleFile(input, key, wrapperId, nameId) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    fileData[key] = e.target.result.split(',')[1]; // base64 only
+    document.getElementById(nameId).textContent = `✓ ${file.name}`;
+    document.getElementById(wrapperId).classList.add('uploaded');
+    updateProgress();
+  };
+  reader.readAsDataURL(file);
+}
+
+// ─── PROGRESS ────────────────────────────────────────────────────────────────
+function updateProgress() {
+  let filled = 0, total = 15;
+  if (document.getElementById('address1').value) filled++;
+  if (document.getElementById('state').value) filled++;
+  if (document.getElementById('district').value) filled++;
+  if (document.getElementById('city').value) filled++;
+  if (document.getElementById('pincode').value.length === 6) filled++;
+  if (document.getElementById('username').value) filled++;
+  if (document.getElementById('mobile_no').value.length === 10) filled++;
+  if (document.getElementById('password').value.length > 0) filled++;
+  if (document.getElementById('Industry').value) filled++;
+  if (document.getElementById('Sector').value) filled++;
+  if (selectedCategories.length > 0) filled++;
+  if (selectedStage) filled++;
+  if (directors.every(d => d.Name && d.Address && d.Mobile_no && d.Email)) filled++;
+  const textareas = ['problem_statement','aboutcompany','who_we_are','solution','uniqueness','revenue_growth'];
+  const allTextOk = textareas.every(id => document.getElementById(id).value.trim().length > 0);
+  if (allTextOk) filled++;
+  if (Object.keys(fileData).length >= 4) filled++;
+  document.getElementById('progressFill').style.width = (filled / total * 100) + '%';
+}
+
+// ─── VALIDATE ────────────────────────────────────────────────────────────────
+function showError(id, show) {
+  const el = document.getElementById('err-' + id);
+  if (el) el.classList.toggle('show', show);
+  const input = document.getElementById(id);
+  if (input) input.classList.toggle('error', show);
+}
+
+function validate() {
+  let ok = true;
+
+  const req = (id, test) => { const pass = test(document.getElementById(id)?.value||''); showError(id, !pass); if (!pass) ok = false; };
+
+  req('address1', v => v.trim().length > 0);
+  req('state', v => v.trim().length > 0);
+  req('district', v => v.trim().length > 0);
+  req('city', v => v.trim().length > 0);
+  req('pincode', v => /^\d{6}$/.test(v));
+  req('username', v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v));
+  req('mobile_no', v => /^\d{10}$/.test(v));
+  req('password', v => v.length > 0);
+  req('Industry', v => v.length > 0);
+  req('Sector', v => v.length > 0);
+  req('no_of_emp', v => parseInt(v) > 0);
+
+  // Categories
+  const catOk = selectedCategories.length > 0;
+  document.getElementById('err-Catogries').classList.toggle('show', !catOk);
+  if (!catOk) ok = false;
+
+  // Stage
+  const stageOk = !!selectedStage;
+  document.getElementById('err-stage').classList.toggle('show', !stageOk);
+  if (!stageOk) ok = false;
+
+  // Text areas - no validation, just required to be non-empty
+  ['problem_statement','aboutcompany','who_we_are','solution','uniqueness','revenue_growth'].forEach(id => {
+    const v = document.getElementById(id).value;
+    if (!v.trim()) ok = false;
+  });
+
+  // Directors
+  const dirOk = directors.length > 0 && directors.every(d => d.Name && d.Address && d.Mobile_no && d.Email);
+  document.getElementById('err-directors').classList.toggle('show', !dirOk);
+  if (!dirOk) ok = false;
+
+  // Files
+  ['lOGO_file','LOA_file','COI_file','pitchdesk_file'].forEach(key => {
+    const pass = !!fileData[key];
+    document.getElementById('err-' + key).classList.toggle('show', !pass);
+    if (!pass) ok = false;
+  });
+
+  return ok;
+}
+
+// ─── GENERATE ────────────────────────────────────────────────────────────────
+function generateJSON() {
+  if (!validate()) {
+    // Scroll to first error
+    const firstErr = document.querySelector('.field-error.show');
+    if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
+  const g = id => document.getElementById(id)?.value || '';
+
+  const result = {
+    comp_address: {
+      address1: g('address1'),
+      address2: g('address2'),
+      state: g('state'),
+      district: g('district'),
+      city: g('city'),
+      pincode: g('pincode')
+    },
+    directors: directors.map(({ id, ...rest }) => rest),
+    username: g('username'),
+    mobile_no: g('mobile_no'),
+    password: g('password'),
+    website: g('website'),
+    Industry: g('Industry'),
+    Sector: g('Sector'),
+    Catogries: selectedCategories,
+    stage: selectedStage,
+    no_of_emp: g('no_of_emp'),
+    problem_statement: g('problem_statement'),
+    aboutcompany: g('aboutcompany'),
+    who_we_are: g('who_we_are'),
+    solution: g('solution'),
+    uniqueness: g('uniqueness'),
+    revenue_growth: g('revenue_growth'),
+    lOGO_file: fileData['lOGO_file'] || '',
+    LOA_file: fileData['LOA_file'] || '',
+    COI_file: fileData['COI_file'] || '',
+    pitchdesk_file: fileData['pitchdesk_file'] || ''
+  };
+
+  generatedJSON = result;
+  const pretty = JSON.stringify(result, null, 2);
+  document.getElementById('previewCode').textContent = pretty;
+  document.getElementById('previewSection').classList.add('show');
+  document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ─── PASSWORD TOGGLE ─────────────────────────────────────────────────────────
+function togglePassword(btn) {
+  const input = document.getElementById('password');
+  const eyeShow = btn.querySelector('#eye-show');
+  const eyeHide = btn.querySelector('#eye-hide');
+  if (input.type === 'password') {
+    input.type = 'text';
+    eyeShow.style.display = 'none';
+    eyeHide.style.display = '';
+  } else {
+    input.type = 'password';
+    eyeShow.style.display = '';
+    eyeHide.style.display = 'none';
+  }
+}
+
+// ─── DOWNLOAD ────────────────────────────────────────────────────────────────
+function downloadJSON() {
+  if (!generatedJSON) return;
+  const blob = new Blob([JSON.stringify(generatedJSON, null, 2)], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'startup_india_registration.txt';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+</script>
+</body>
+</html>

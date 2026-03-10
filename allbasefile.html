@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BaseForge — Multi-Base Encoder & Decoder</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+/* ════════════════════════════════════════════════
+   RESET & VARIABLES
+════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d1117;
+  --surface:#161b22;
+  --surface2:#1c2333;
+  --surface3:#21262d;
+  --border:#30363d;
+  --border2:#444c56;
+  --text:#e6edf3;
+  --text2:#8b949e;
+  --text3:#6e7681;
+  --accent:#58a6ff;
+  --accent2:#3fb950;
+  --accent3:#f78166;
+  --accent4:#d2a8ff;
+  --accent5:#ffa657;
+  --yellow:#e3b341;
+  --radius:10px;
+  --radius-lg:16px;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'Outfit',sans-serif;
+  --shadow:0 8px 32px rgba(0,0,0,0.5);
+  --shadow-sm:0 2px 8px rgba(0,0,0,0.3);
+}
+
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans);
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  padding:0 0 80px;
+  line-height:1.6;
+  background-image:
+    radial-gradient(ellipse 80% 40% at 50% -10%, rgba(88,166,255,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 30% at 80% 100%, rgba(63,185,80,0.05) 0%, transparent 50%);
+}
+
+/* ════════════════════════════════════════════════
+   HEADER
+════════════════════════════════════════════════ */
+.page-header{
+  text-align:center;
+  padding:52px 20px 40px;
+  position:relative;
+}
+.header-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(88,166,255,0.1);
+  border:1px solid rgba(88,166,255,0.2);
+  color:var(--accent);
+  font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  padding:5px 14px;border-radius:999px;margin-bottom:20px;
+  font-family:var(--mono);
+}
+.page-header h1{
+  font-size:clamp(2rem,6vw,3.6rem);
+  font-weight:800;letter-spacing:-0.04em;line-height:1.1;
+  background:linear-gradient(135deg,var(--text) 30%,var(--accent));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.page-header h1 .brand{color:var(--accent);-webkit-text-fill-color:unset;}
+.page-header p{margin-top:12px;color:var(--text2);font-size:1rem;max-width:500px;margin-inline:auto;}
+
+/* ════════════════════════════════════════════════
+   LAYOUT
+════════════════════════════════════════════════ */
+.container{max-width:1100px;margin:0 auto;padding:0 20px;}
+.main-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.full-width{grid-column:1/-1;}
+@media(max-width:800px){.main-grid{grid-template-columns:1fr;}}
+
+/* ════════════════════════════════════════════════
+   CARDS / PANELS
+════════════════════════════════════════════════ */
+.panel{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  padding:24px;
+  box-shadow:var(--shadow-sm);
+  position:relative;
+  overflow:hidden;
+}
+.panel::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--accent),transparent);
+  opacity:0.4;
+}
+.panel.green::before{background:linear-gradient(90deg,transparent,var(--accent2),transparent);}
+.panel.purple::before{background:linear-gradient(90deg,transparent,var(--accent4),transparent);}
+.panel.orange::before{background:linear-gradient(90deg,transparent,var(--accent5),transparent);}
+
+.panel-header{
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:20px;
+  padding-bottom:16px;
+  border-bottom:1px solid var(--border);
+}
+.panel-icon{
+  width:36px;height:36px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;flex-shrink:0;
+}
+.pi-blue{background:rgba(88,166,255,0.15);}
+.pi-green{background:rgba(63,185,80,0.15);}
+.pi-purple{background:rgba(210,168,255,0.15);}
+.pi-orange{background:rgba(255,166,87,0.15);}
+.pi-red{background:rgba(247,129,102,0.15);}
+
+.panel-title{font-size:1rem;font-weight:700;letter-spacing:-.01em;}
+.panel-sub{font-size:.75rem;color:var(--text3);margin-top:2px;}
+.step-badge{
+  margin-left:auto;
+  background:var(--surface3);border:1px solid var(--border);
+  color:var(--text3);font-size:10px;font-weight:700;font-family:var(--mono);
+  padding:3px 9px;border-radius:6px;letter-spacing:.05em;
+}
+
+/* ════════════════════════════════════════════════
+   FORM ELEMENTS
+════════════════════════════════════════════════ */
+label.field-label{
+  display:block;font-size:.78rem;font-weight:600;color:var(--text2);
+  margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase;
+}
+
+textarea{
+  width:100%;background:var(--surface3);
+  border:1px solid var(--border);border-radius:var(--radius);
+  color:var(--text);font-family:var(--mono);font-size:.78rem;line-height:1.7;
+  padding:12px 14px;resize:vertical;outline:none;
+  transition:border-color .2s,box-shadow .2s;
+  min-height:110px;
+}
+textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(88,166,255,0.1);}
+textarea::placeholder{color:var(--text3);}
+textarea.output-ta{min-height:140px;background:rgba(13,17,23,0.6);}
+textarea.decode-ta{min-height:110px;}
+
+select{
+  width:100%;background:var(--surface3);
+  border:1px solid var(--border);border-radius:var(--radius);
+  color:var(--text);font-family:var(--mono);font-size:.82rem;
+  padding:10px 14px;outline:none;cursor:pointer;
+  transition:border-color .2s;
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='2'%3E%3Cpolyline points='6,9 12,15 18,9'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;
+  padding-right:36px;
+}
+select:focus{border-color:var(--accent);}
+
+/* ════════════════════════════════════════════════
+   BUTTONS
+════════════════════════════════════════════════ */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  padding:9px 16px;border-radius:8px;
+  font-family:var(--sans);font-size:.82rem;font-weight:600;
+  cursor:pointer;border:1px solid transparent;
+  transition:all .18s ease;text-decoration:none;
+  white-space:nowrap;
+}
+.btn:active{transform:scale(0.96)!important;}
+
+.btn-primary{background:var(--accent);color:#0d1117;border-color:var(--accent);}
+.btn-primary:hover{background:#79bcff;box-shadow:0 4px 16px rgba(88,166,255,0.3);transform:translateY(-1px);}
+
+.btn-success{background:var(--accent2);color:#0d1117;border-color:var(--accent2);}
+.btn-success:hover{background:#56d364;box-shadow:0 4px 16px rgba(63,185,80,0.3);transform:translateY(-1px);}
+
+.btn-ghost{background:transparent;color:var(--text2);border-color:var(--border);}
+.btn-ghost:hover{background:var(--surface3);color:var(--text);border-color:var(--border2);}
+
+.btn-danger{background:transparent;color:var(--accent3);border-color:rgba(247,129,102,0.3);}
+.btn-danger:hover{background:rgba(247,129,102,0.1);border-color:var(--accent3);}
+
+.btn-sm{padding:6px 12px;font-size:.75rem;}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+
+/* ════════════════════════════════════════════════
+   BASE ENCODING BUTTONS GRID
+════════════════════════════════════════════════ */
+.encode-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(105px,1fr));
+  gap:8px;
+  margin-bottom:4px;
+}
+.base-btn{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:12px 8px;border-radius:10px;cursor:pointer;
+  background:var(--surface3);border:1px solid var(--border);
+  transition:all .18s;gap:4px;
+}
+.base-btn:hover{border-color:var(--accent);background:rgba(88,166,255,0.08);transform:translateY(-2px);}
+.base-btn:active{transform:scale(0.96);}
+.base-btn .bb-name{font-weight:700;font-size:.82rem;font-family:var(--mono);color:var(--text);}
+.base-btn .bb-sub{font-size:.65rem;color:var(--text3);font-family:var(--mono);}
+.base-btn.active{border-color:var(--accent);background:rgba(88,166,255,0.12);box-shadow:0 0 0 2px rgba(88,166,255,0.2);}
+
+/* ════════════════════════════════════════════════
+   DROP ZONE
+════════════════════════════════════════════════ */
+.drop-zone{
+  border:2px dashed var(--border);border-radius:var(--radius);
+  padding:24px 16px;text-align:center;cursor:pointer;
+  transition:all .2s;position:relative;margin-top:12px;
+}
+.drop-zone:hover,.drop-zone.drag-over{
+  border-color:var(--accent);background:rgba(88,166,255,0.05);
+}
+.drop-zone input[type=file]{
+  position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;
+}
+.dz-icon{font-size:28px;margin-bottom:6px;}
+.dz-text{font-size:.8rem;color:var(--text2);line-height:1.5;}
+.dz-text strong{color:var(--accent);}
+
+/* ════════════════════════════════════════════════
+   FILE INFO CHIP
+════════════════════════════════════════════════ */
+.file-chip{
+  display:flex;align-items:center;gap:10px;
+  background:var(--surface3);border:1px solid var(--border);
+  border-radius:8px;padding:8px 12px;margin-top:10px;
+  font-size:.78rem;
+}
+.fc-icon{font-size:18px;flex-shrink:0;}
+.fc-name{font-family:var(--mono);font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.fc-size{margin-left:auto;flex-shrink:0;background:var(--border);border-radius:5px;padding:2px 8px;font-family:var(--mono);color:var(--text2);}
+
+/* ════════════════════════════════════════════════
+   STATS ROW
+════════════════════════════════════════════════ */
+.stats-row{
+  display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;
+}
+.stat-chip{
+  background:var(--surface3);border:1px solid var(--border);
+  border-radius:6px;padding:4px 10px;
+  font-family:var(--mono);font-size:.7rem;color:var(--text2);
+  display:flex;align-items:center;gap:5px;
+}
+.stat-chip .sc-val{color:var(--accent);font-weight:600;}
+.stat-chip.green .sc-val{color:var(--accent2);}
+.stat-chip.yellow .sc-val{color:var(--yellow);}
+
+/* ════════════════════════════════════════════════
+   IMAGE PREVIEW
+════════════════════════════════════════════════ */
+.img-preview{
+  border-radius:8px;overflow:hidden;border:1px solid var(--border);
+  max-height:160px;display:flex;align-items:center;justify-content:center;
+  background:var(--surface3);margin-top:10px;
+}
+.img-preview img{max-height:160px;max-width:100%;object-fit:contain;}
+
+/* ════════════════════════════════════════════════
+   ERROR / SUCCESS BANNERS
+════════════════════════════════════════════════ */
+.banner{
+  display:none;
+  padding:10px 14px;border-radius:8px;
+  font-size:.8rem;font-weight:500;
+  align-items:center;gap:8px;margin-top:10px;
+}
+.banner.show{display:flex;}
+.banner-error{background:rgba(247,129,102,0.12);border:1px solid rgba(247,129,102,0.3);color:var(--accent3);}
+.banner-success{background:rgba(63,185,80,0.1);border:1px solid rgba(63,185,80,0.25);color:var(--accent2);}
+
+/* ════════════════════════════════════════════════
+   TOAST
+════════════════════════════════════════════════ */
+.toast{
+  position:fixed;bottom:28px;left:50%;
+  transform:translateX(-50%) translateY(100px);
+  background:var(--surface2);border:1px solid var(--border2);
+  color:var(--text);padding:11px 22px;border-radius:999px;
+  font-size:.82rem;font-weight:600;
+  display:flex;align-items:center;gap:8px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.5);
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1);
+  z-index:1000;pointer-events:none;
+  font-family:var(--mono);
+}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast-dot{width:8px;height:8px;border-radius:50%;background:var(--accent2);animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(0.8);}}
+
+/* ════════════════════════════════════════════════
+   OUTPUT ACTIVE STATE
+════════════════════════════════════════════════ */
+.output-label-row{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:6px;
+}
+.output-badge{
+  font-family:var(--mono);font-size:.7rem;font-weight:700;
+  padding:3px 10px;border-radius:5px;
+  background:rgba(88,166,255,0.12);border:1px solid rgba(88,166,255,0.25);
+  color:var(--accent);
+}
+
+/* ════════════════════════════════════════════════
+   DIVIDER WITH LABEL
+════════════════════════════════════════════════ */
+.or-divider{
+  display:flex;align-items:center;gap:10px;
+  color:var(--text3);font-size:.72rem;font-family:var(--mono);
+  margin:12px 0;
+}
+.or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ════════════════════════════════════════════════
+   DECODE SECTION SPECIFICS
+════════════════════════════════════════════════ */
+.decode-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;}
+@media(max-width:500px){.decode-row{grid-template-columns:1fr;}}
+
+/* ════════════════════════════════════════════════
+   SCROLLBAR
+════════════════════════════════════════════════ */
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:var(--surface);}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--text3);}
+
+/* ════════════════════════════════════════════════
+   ANIMATIONS
+════════════════════════════════════════════════ */
+@keyframes fadeInUp{
+  from{opacity:0;transform:translateY(14px);}
+  to{opacity:1;transform:translateY(0);}
+}
+.panel{animation:fadeInUp .4s ease both;}
+.panel:nth-child(2){animation-delay:.06s;}
+.panel:nth-child(3){animation-delay:.12s;}
+.panel:nth-child(4){animation-delay:.18s;}
+
+/* ════════════════════════════════════════════════
+   RESPONSIVE TWEAKS
+════════════════════════════════════════════════ */
+@media(max-width:500px){
+  .encode-grid{grid-template-columns:repeat(3,1fr);}
+  .btn-row{gap:6px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     PAGE HEADER
+══════════════════════════════════════ -->
+<header class="page-header">
+  <div class="header-eyebrow">⚙ Developer Utility Tool</div>
+  <h1>Base<span class="brand">Forge</span></h1>
+  <p>Encode text & files to any base encoding — then decode them back instantly.</p>
+</header>
+
+<div class="container">
+<div class="main-grid">
+
+  <!-- ══════════════════════════════════════
+       SECTION 1 — INPUT
+  ══════════════════════════════════════ -->
+  <div class="panel full-width">
+    <div class="panel-header">
+      <div class="panel-icon pi-blue">📥</div>
+      <div>
+        <div class="panel-title">Input</div>
+        <div class="panel-sub">Type text or upload a file to encode</div>
+      </div>
+      <span class="step-badge">STEP 01</span>
+    </div>
+
+    <!-- Text Input -->
+    <label class="field-label">Text Input</label>
+    <textarea id="textInput" rows="5"
+      placeholder="Type or paste your text here…&#10;&#10;Or drop a file below to load its contents."
+      oninput="onTextInput()"></textarea>
+
+    <div class="stats-row">
+      <div class="stat-chip">Chars: <span class="sc-val" id="inputCharCount">0</span></div>
+      <div class="stat-chip">Bytes: <span class="sc-val" id="inputByteCount">0</span></div>
+    </div>
+
+    <!-- File Upload -->
+    <div class="or-divider">or upload a file</div>
+    <div class="drop-zone" id="dropZone">
+      <input type="file" id="fileInput" accept=".png,.jpg,.jpeg,.pdf,.txt,.json,.svg,.gif,.webp,.bin"/>
+      <div class="dz-icon">☁️</div>
+      <div class="dz-text"><strong>Click to upload</strong> or drag & drop<br/>PNG, JPG, PDF, TXT, JSON, and more</div>
+    </div>
+
+    <!-- File info chip -->
+    <div id="fileChip" class="file-chip" style="display:none">
+      <span class="fc-icon" id="fcIcon">📄</span>
+      <span class="fc-name" id="fcName">—</span>
+      <span class="fc-size" id="fcSize">—</span>
+    </div>
+
+    <!-- Image Preview -->
+    <div id="imgPreview" class="img-preview" style="display:none"></div>
+
+    <!-- Input Error -->
+    <div id="inputError" class="banner banner-error"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SECTION 2 — ENCODING BUTTONS
+  ══════════════════════════════════════ -->
+  <div class="panel green">
+    <div class="panel-header">
+      <div class="panel-icon pi-green">🔀</div>
+      <div>
+        <div class="panel-title">Encode</div>
+        <div class="panel-sub">Select a base to convert input</div>
+      </div>
+      <span class="step-badge">STEP 02</span>
+    </div>
+
+    <div class="encode-grid" id="encodeGrid">
+      <!-- Populated by JS -->
+    </div>
+
+    <div id="encodeError" class="banner banner-error" style="margin-top:10px;"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SECTION 3 — DECODE
+  ══════════════════════════════════════ -->
+  <div class="panel purple">
+    <div class="panel-header">
+      <div class="panel-icon pi-purple">🔓</div>
+      <div>
+        <div class="panel-title">Decode</div>
+        <div class="panel-sub">Paste encoded text and decode it</div>
+      </div>
+      <span class="step-badge">STEP 03</span>
+    </div>
+
+    <label class="field-label">Encoded Input</label>
+    <textarea id="decodeInput" class="decode-ta"
+      placeholder="Paste your Base2/8/10/16/32/64/85 encoded string here…"
+      oninput="onDecodeInput()"></textarea>
+
+    <div class="stats-row" style="margin-bottom:12px;">
+      <div class="stat-chip">Chars: <span class="sc-val" id="decodeCharCount">0</span></div>
+    </div>
+
+    <div class="decode-row">
+      <div>
+        <label class="field-label">Encoding Type</label>
+        <select id="decodeSelect">
+          <option value="">— Auto Detect —</option>
+          <option value="base2">Base2 (Binary)</option>
+          <option value="base8">Base8 (Octal)</option>
+          <option value="base10">Base10 (Decimal)</option>
+          <option value="base16">Base16 (Hex)</option>
+          <option value="base32">Base32</option>
+          <option value="base64">Base64</option>
+          <option value="base85">Base85</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="decode()" style="margin-bottom:0;">
+        🔓 Decode
+      </button>
+    </div>
+
+    <div id="decodeError" class="banner banner-error"></div>
+    <div id="decodeSuccess" class="banner banner-success"></div>
+
+    <!-- Download decoded file -->
+    <div id="downloadRow" style="display:none;margin-top:10px;">
+      <button class="btn btn-success btn-sm" onclick="downloadDecoded()">
+        ⬇️ Download Decoded File
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SECTION 4 — OUTPUT PANEL
+  ══════════════════════════════════════ -->
+  <div class="panel orange full-width">
+    <div class="panel-header">
+      <div class="panel-icon pi-orange">📤</div>
+      <div>
+        <div class="panel-title">Output</div>
+        <div class="panel-sub">Encoded or decoded result appears here</div>
+      </div>
+      <span class="step-badge">STEP 04</span>
+    </div>
+
+    <div class="output-label-row">
+      <label class="field-label" style="margin:0;">Result</label>
+      <span class="output-badge" id="outputBadge">—</span>
+    </div>
+    <textarea id="outputArea" class="output-ta" rows="7"
+      readonly placeholder="Output will appear here after encoding or decoding…"></textarea>
+
+    <div class="stats-row" style="margin-bottom:14px;">
+      <div class="stat-chip green">Output chars: <span class="sc-val green" id="outputCharCount">0</span></div>
+      <div class="stat-chip yellow">Output bytes: <span class="sc-val yellow" id="outputByteCount">0</span></div>
+      <div class="stat-chip">Ratio: <span class="sc-val" id="sizeRatio">—</span></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="copyOutput()">📋 Copy Output</button>
+      <button class="btn btn-ghost" onclick="clearOutput()">✕ Clear</button>
+      <button class="btn btn-success" id="downloadOutputBtn" style="display:none;" onclick="downloadOutput()">⬇️ Download</button>
+    </div>
+
+    <div id="outputError" class="banner banner-error"></div>
+  </div>
+
+</div><!-- /main-grid -->
+</div><!-- /container -->
+
+<!-- Toast -->
+<div class="toast" id="toast"><span class="toast-dot"></span><span id="toastMsg">Copied!</span></div>
+
+<!-- ══════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════ -->
+<script>
+'use strict';
+
+/* ────────────────────────────────────────
+   STATE
+──────────────────────────────────────── */
+let fileDataUrl = null;   // raw data URI of uploaded file
+let fileBytes   = null;   // Uint8Array of file content
+let fileMime    = '';
+let fileName    = '';
+let lastMode    = '';     // 'encode' | 'decode'
+let lastEncoding= '';
+let decodedBytes= null;   // for decoded file download
+
+/* ────────────────────────────────────────
+   BASE DEFINITIONS
+──────────────────────────────────────── */
+const BASES = [
+  { id:'base2',  name:'Base2',  sub:'Binary',  icon:'01' },
+  { id:'base8',  name:'Base8',  sub:'Octal',   icon:'07' },
+  { id:'base10', name:'Base10', sub:'Decimal', icon:'09' },
+  { id:'base16', name:'Base16', sub:'Hex',     icon:'0F' },
+  { id:'base32', name:'Base32', sub:'RFC 4648',icon:'A2' },
+  { id:'base64', name:'Base64', sub:'Standard',icon:'64' },
+  { id:'base85', name:'Base85', sub:'ASCII85', icon:'85' },
+];
+
+/* ────────────────────────────────────────
+   BUILD ENCODE GRID
+──────────────────────────────────────── */
+(function buildGrid(){
+  const grid = document.getElementById('encodeGrid');
+  BASES.forEach(b=>{
+    const btn = document.createElement('div');
+    btn.className='base-btn';btn.dataset.id=b.id;
+    btn.innerHTML=`<span class="bb-name">${b.name}</span><span class="bb-sub">${b.sub}</span>`;
+    btn.addEventListener('click',()=>encode(b.id, btn));
+    grid.appendChild(btn);
+  });
+})();
+
+/* ────────────────────────────────────────
+   HELPERS
+──────────────────────────────────────── */
+function fmtSize(b){
+  if(b<1024)return b+' B';
+  if(b<1048576)return(b/1024).toFixed(1)+' KB';
+  return(b/1048576).toFixed(2)+' MB';
+}
+function showToast(msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toastMsg').textContent=msg;
+  t.classList.add('show');
+  clearTimeout(t._tid);
+  t._tid=setTimeout(()=>t.classList.remove('show'),2500);
+}
+function showBanner(id, msg, type='error'){
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.textContent=msg;
+  el.className=`banner banner-${type} show`;
+  if(type==='success') setTimeout(()=>el.classList.remove('show'),3000);
+}
+function hideBanner(id){
+  const el=document.getElementById(id);if(el) el.classList.remove('show');
+}
+function setOutputBadge(label){
+  document.getElementById('outputBadge').textContent=label;
+}
+function updateOutputStats(text){
+  const cc = text.length;
+  const bc = new TextEncoder().encode(text).length;
+  document.getElementById('outputCharCount').textContent=cc.toLocaleString();
+  document.getElementById('outputByteCount').textContent=bc.toLocaleString();
+  const inputBytes = +document.getElementById('inputByteCount').textContent.replace(/,/g,'');
+  if(inputBytes>0&&bc>0){
+    document.getElementById('sizeRatio').textContent=(bc/inputBytes).toFixed(2)+'x';
+  } else {
+    document.getElementById('sizeRatio').textContent='—';
+  }
+}
+
+/* ────────────────────────────────────────
+   TEXT INPUT
+──────────────────────────────────────── */
+function onTextInput(){
+  const val = document.getElementById('textInput').value;
+  const bytes = new TextEncoder().encode(val).length;
+  document.getElementById('inputCharCount').textContent=val.length.toLocaleString();
+  document.getElementById('inputByteCount').textContent=bytes.toLocaleString();
+  // clear file state when text typed
+  if(val.length>0){
+    fileDataUrl=null; fileBytes=null; fileMime=''; fileName='';
+    document.getElementById('fileChip').style.display='none';
+    document.getElementById('imgPreview').style.display='none';
+    document.getElementById('imgPreview').innerHTML='';
+  }
+}
+
+/* ────────────────────────────────────────
+   FILE HANDLING
+──────────────────────────────────────── */
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+
+dropZone.addEventListener('dragover', e=>{e.preventDefault();dropZone.classList.add('drag-over');});
+dropZone.addEventListener('dragleave', ()=>dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e=>{
+  e.preventDefault(); dropZone.classList.remove('drag-over');
+  if(e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', e=>{ if(e.target.files[0]) loadFile(e.target.files[0]); });
+
+function fileTypeIcon(mime){
+  if(!mime) return '📄';
+  if(mime.startsWith('image/')) return '🖼️';
+  if(mime==='application/pdf') return '📕';
+  if(mime.startsWith('text/')) return '📝';
+  if(mime.includes('json')) return '🗂️';
+  return '📦';
+}
+
+function loadFile(file){
+  hideBanner('inputError');
+  fileMime = file.type || 'application/octet-stream';
+  fileName = file.name;
+
+  const chip = document.getElementById('fileChip');
+  chip.style.display='flex';
+  document.getElementById('fcIcon').textContent=fileTypeIcon(fileMime);
+  document.getElementById('fcName').textContent=fileName;
+  document.getElementById('fcSize').textContent=fmtSize(file.size);
+  document.getElementById('inputByteCount').textContent=file.size.toLocaleString();
+  document.getElementById('inputCharCount').textContent='—';
+  document.getElementById('textInput').value='';
+
+  const reader = new FileReader();
+  reader.onload = e=>{
+    fileDataUrl = e.target.result;
+    fileBytes = new Uint8Array(atob(fileDataUrl.split(',')[1]).split('').map(c=>c.charCodeAt(0)));
+
+    // image preview
+    const pw=document.getElementById('imgPreview');
+    if(fileMime.startsWith('image/')){
+      pw.style.display='flex';pw.innerHTML='';
+      const img=document.createElement('img');img.src=fileDataUrl;pw.appendChild(img);
+    } else { pw.style.display='none';pw.innerHTML=''; }
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ────────────────────────────────────────
+   ENCODING ALGORITHMS
+──────────────────────────────────────── */
+function getInputBytes(){
+  if(fileBytes) return fileBytes;
+  const txt = document.getElementById('textInput').value;
+  if(!txt) return null;
+  return new TextEncoder().encode(txt);
+}
+
+// Base2
+function toBase2(bytes){ return Array.from(bytes).map(b=>b.toString(2).padStart(8,'0')).join(' '); }
+// Base8
+function toBase8(bytes){ return Array.from(bytes).map(b=>b.toString(8).padStart(3,'0')).join(' '); }
+// Base10
+function toBase10(bytes){ return Array.from(bytes).map(b=>b.toString(10)).join(' '); }
+// Base16
+function toBase16(bytes){ return Array.from(bytes).map(b=>b.toString(16).padStart(2,'0').toUpperCase()).join(''); }
+// Base32 (RFC 4648)
+function toBase32(bytes){
+  const alphabet='ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+  let bits=0,val=0,out='';
+  for(const byte of bytes){ val=(val<<8)|byte; bits+=8; while(bits>=5){out+=alphabet[(val>>>(bits-5))&31];bits-=5;} }
+  if(bits>0) out+=alphabet[(val<<(5-bits))&31];
+  while(out.length%8) out+='=';
+  return out;
+}
+// Base64
+function toBase64(bytes){
+  let bin='';
+  bytes.forEach(b=>bin+=String.fromCharCode(b));
+  return btoa(bin);
+}
+// Base85 (ASCII85 / btoa variant)
+function toBase85(bytes){
+  const alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!#$%&()*+-;<=>?@^_`{|}~";
+  let out='';
+  for(let i=0;i<bytes.length;i+=4){
+    let val=0, chunk=Math.min(4,bytes.length-i);
+    for(let j=0;j<4;j++) val=(val*256)+(j<chunk?bytes[i+j]:0);
+    let group='';
+    for(let j=0;j<5;j++){ group=alphabet[val%85]+group; val=Math.floor(val/85); }
+    out+=group.slice(0,chunk+1);
+  }
+  return out;
+}
+
+/* ────────────────────────────────────────
+   DECODING ALGORITHMS
+──────────────────────────────────────── */
+function fromBase2(str){
+  const parts=str.trim().split(/\s+/);
+  if(parts.some(p=>!/^[01]{1,8}$/.test(p))) throw new Error('Invalid Base2 string');
+  return new Uint8Array(parts.map(p=>parseInt(p,2)));
+}
+function fromBase8(str){
+  const parts=str.trim().split(/\s+/);
+  if(parts.some(p=>!/^[0-7]{1,3}$/.test(p))) throw new Error('Invalid Base8 string');
+  return new Uint8Array(parts.map(p=>parseInt(p,8)));
+}
+function fromBase10(str){
+  const parts=str.trim().split(/\s+/);
+  if(parts.some(p=>!/^\d+$/.test(p))) throw new Error('Invalid Base10 string');
+  return new Uint8Array(parts.map(p=>parseInt(p,10)));
+}
+function fromBase16(str){
+  const clean=str.replace(/\s+/g,'');
+  if(!/^[0-9A-Fa-f]+$/.test(clean)||clean.length%2!==0) throw new Error('Invalid Base16/Hex string');
+  const arr=new Uint8Array(clean.length/2);
+  for(let i=0;i<clean.length;i+=2) arr[i/2]=parseInt(clean.slice(i,i+2),16);
+  return arr;
+}
+function fromBase32(str){
+  const alphabet='ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+  const clean=str.replace(/=+$/,'').toUpperCase();
+  if(!/^[A-Z2-7]+$/.test(clean)) throw new Error('Invalid Base32 string');
+  let bits=0,val=0; const out=[];
+  for(const ch of clean){
+    const idx=alphabet.indexOf(ch);
+    if(idx<0) throw new Error('Invalid Base32 character: '+ch);
+    val=(val<<5)|idx; bits+=5;
+    if(bits>=8){ out.push((val>>>(bits-8))&255); bits-=8; }
+  }
+  return new Uint8Array(out);
+}
+function fromBase64(str){
+  try{
+    const bin=atob(str.replace(/\s/g,''));
+    return new Uint8Array([...bin].map(c=>c.charCodeAt(0)));
+  }catch(e){ throw new Error('Invalid Base64 string'); }
+}
+function fromBase85(str){
+  const alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!#$%&()*+-;<=>?@^_`{|}~";
+  const out=[];
+  let i=0;
+  while(i<str.length){
+    const chunk=str.slice(i,i+5); i+=chunk.length;
+    if(chunk.length<2) break;
+    let val=0;
+    for(const c of chunk){ const idx=alphabet.indexOf(c); if(idx<0) throw new Error('Invalid Base85 char: '+c); val=val*85+idx; }
+    const bytes=chunk.length-1;
+    for(let j=bytes-1;j>=0;j--) out[out.length]=(val>>>(j*8))&0xFF;
+  }
+  return new Uint8Array(out);
+}
+
+/* ────────────────────────────────────────
+   AUTO DETECT ENCODING
+──────────────────────────────────────── */
+function autoDetect(str){
+  const s=str.trim();
+  if(/^[01](\s[01]{8})*$/.test(s)||/^[01]{8}(\s[01]{8})*$/.test(s)) return 'base2';
+  if(/^[0-7]{3}(\s[0-7]{1,3})*$/.test(s)) return 'base8';
+  if(/^\d+(\s\d+)*$/.test(s)&&s.includes(' ')) return 'base10';
+  if(/^[0-9A-Fa-f]+$/.test(s.replace(/\s/g,''))&&s.replace(/\s/g,'').length%2===0) return 'base16';
+  if(/^[A-Z2-7]+=*$/.test(s)) return 'base32';
+  if(/^[A-Za-z0-9+/]+=*$/.test(s)) return 'base64';
+  return 'base85';
+}
+
+/* ────────────────────────────────────────
+   ENCODE ACTION
+──────────────────────────────────────── */
+function encode(baseId, btnEl){
+  hideBanner('encodeError');hideBanner('outputError');
+  const bytes = getInputBytes();
+  if(!bytes||bytes.length===0){ showBanner('encodeError','⚠ No input! Type text or upload a file.'); return; }
+
+  // highlight active btn
+  document.querySelectorAll('.base-btn').forEach(b=>b.classList.remove('active'));
+  if(btnEl) btnEl.classList.add('active');
+
+  try{
+    let result='';
+    switch(baseId){
+      case 'base2':  result=toBase2(bytes);break;
+      case 'base8':  result=toBase8(bytes);break;
+      case 'base10': result=toBase10(bytes);break;
+      case 'base16': result=toBase16(bytes);break;
+      case 'base32': result=toBase32(bytes);break;
+      case 'base64': result=toBase64(bytes);break;
+      case 'base85': result=toBase85(bytes);break;
+      default: throw new Error('Unknown base');
+    }
+    document.getElementById('outputArea').value=result;
+    setOutputBadge(BASES.find(b=>b.id===baseId)?.name+' encoded');
+    updateOutputStats(result);
+    lastMode='encode';lastEncoding=baseId;
+    document.getElementById('downloadOutputBtn').style.display='inline-flex';
+    showToast('✅ Encoded to '+baseId.toUpperCase());
+  }catch(e){
+    showBanner('encodeError','❌ Encoding failed: '+e.message);
+  }
+}
+
+/* ────────────────────────────────────────
+   DECODE INPUT COUNTER
+──────────────────────────────────────── */
+function onDecodeInput(){
+  const v=document.getElementById('decodeInput').value;
+  document.getElementById('decodeCharCount').textContent=v.length.toLocaleString();
+  hideBanner('decodeError');hideBanner('decodeSuccess');
+}
+
+/* ────────────────────────────────────────
+   DECODE ACTION
+──────────────────────────────────────── */
+function decode(){
+  hideBanner('decodeError');hideBanner('decodeSuccess');
+  const raw=document.getElementById('decodeInput').value.trim();
+  if(!raw){ showBanner('decodeError','⚠ Paste an encoded string first.'); return; }
+
+  let baseId=document.getElementById('decodeSelect').value;
+  if(!baseId){ baseId=autoDetect(raw); showBanner('decodeSuccess',`🔍 Auto-detected: ${baseId.toUpperCase()}`,'success'); }
+
+  try{
+    let bytes;
+    switch(baseId){
+      case 'base2':  bytes=fromBase2(raw);break;
+      case 'base8':  bytes=fromBase8(raw);break;
+      case 'base10': bytes=fromBase10(raw);break;
+      case 'base16': bytes=fromBase16(raw);break;
+      case 'base32': bytes=fromBase32(raw);break;
+      case 'base64': bytes=fromBase64(raw);break;
+      case 'base85': bytes=fromBase85(raw);break;
+      default: throw new Error('Select an encoding type');
+    }
+    // Try to render as text
+    const text = new TextDecoder('utf-8',{fatal:true}).decode(bytes);
+    document.getElementById('outputArea').value=text;
+    setOutputBadge(baseId.toUpperCase()+' decoded → text');
+    updateOutputStats(text);
+    lastMode='decode';lastEncoding=baseId;
+    decodedBytes=bytes;
+    document.getElementById('downloadRow').style.display='block';
+    document.getElementById('downloadOutputBtn').style.display='inline-flex';
+    showToast('✅ Decoded from '+baseId.toUpperCase());
+  }catch(e){
+    // maybe binary — store bytes anyway
+    showBanner('decodeError','❌ Decode failed: '+e.message);
+  }
+}
+
+/* ────────────────────────────────────────
+   OUTPUT ACTIONS
+──────────────────────────────────────── */
+function copyOutput(){
+  const val=document.getElementById('outputArea').value;
+  if(!val){ showToast('⚠ Nothing to copy'); return; }
+  navigator.clipboard.writeText(val)
+    .then(()=>showToast('📋 Copied to clipboard!'))
+    .catch(()=>{ document.getElementById('outputArea').select(); document.execCommand('copy'); showToast('📋 Copied!'); });
+}
+
+function clearOutput(){
+  document.getElementById('outputArea').value='';
+  document.getElementById('outputCharCount').textContent='0';
+  document.getElementById('outputByteCount').textContent='0';
+  document.getElementById('sizeRatio').textContent='—';
+  setOutputBadge('—');
+  document.getElementById('downloadOutputBtn').style.display='none';
+  document.querySelectorAll('.base-btn').forEach(b=>b.classList.remove('active'));
+  hideBanner('outputError');
+}
+
+function downloadOutput(){
+  const val=document.getElementById('outputArea').value;
+  if(!val){ showBanner('outputError','⚠ No output to download.'); return; }
+  const ext = lastMode==='encode' ? getEncodeExt(lastEncoding) : 'txt';
+  const mimeType = 'text/plain';
+  const blob=new Blob([val],{type:mimeType});
+  triggerDownload(blob,`output.${ext}`);
+}
+function getEncodeExt(base){ return base==='base64'?'b64':base==='base16'?'hex':base==='base32'?'b32':base==='base2'?'bin':base==='base85'?'b85':'txt'; }
+
+function downloadDecoded(){
+  if(!decodedBytes){ showBanner('decodeError','No decoded bytes available.'); return; }
+  const blob=new Blob([decodedBytes],{type:'application/octet-stream'});
+  triggerDownload(blob,'decoded-file.bin');
+}
+
+function triggerDownload(blob, name){
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=name;a.click();
+  URL.revokeObjectURL(url);
+  showToast('⬇️ Download started: '+name);
+}
+</script>
+</body>
+</html>

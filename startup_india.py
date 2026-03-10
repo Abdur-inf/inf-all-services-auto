@@ -10,13 +10,17 @@ import os
 import base64
 import tempfile
 import datetime
-import log
+
+# =============================== #
+#          Color Logger           #
+# =============================== #
+import logging
 import colorlog
 
 handler = colorlog.StreamHandler()
 
 formatter = colorlog.ColoredFormatter(
-    "%(log_color)s%(levelname)s:%(name)s:%(message)s",
+    "%(log_color)s%(asctime)s | %(levelname)s | %(name)s | %(message)s",
     log_colors={
         'DEBUG': 'cyan',
         'INFO': 'green',
@@ -30,14 +34,19 @@ handler.setFormatter(formatter)
 
 log = colorlog.getLogger()
 log.addHandler(handler)
-log.setLevel(log.DEBUG)
+log.setLevel(logging.INFO)
 
-log.basicConfig(level=log.INFO,format="%(asctime)s - %(levelname)s - %(message)s - %(filename)s - %(lineno)d - %(name)s")
-log.debug("Debug message")
-log.info("Program started")
-log.warning("Low disk space")
-log.error("File not found")
-log.critical("System crash")
+# =============================== #
+#          Normal Logger          #
+# =============================== #
+
+# import logging as log
+# log.basicConfig(level=log.INFO,format="%(asctime)s - %(levelname)s - %(message)s - %(filename)s - %(lineno)d - %(name)s")
+# log.info("Debug message")
+# log.info("Program started")
+# log.warning("Low disk space")
+# log.error("File not found")
+# log.critical("System crash")
 
 def clipboard(value):
     pyperclip.copy(value)
@@ -233,7 +242,7 @@ def startup_india(data):
             element.click()
             time.sleep(2)
 
-            log.debug("Start Up Profile Complete")
+            log.info("Start Up Profile Complete")
 
             # =============================== #
             #       Entity Details            #
@@ -329,7 +338,7 @@ def startup_india(data):
             driver.execute_script("arguments[0].click();", elements)
 
             time.sleep(1)
-            log.debug("Entity Details Completed")
+            log.info("Entity Details Completed")
 
             # =============================== #
             #       Full Address(Office)      #
@@ -393,7 +402,7 @@ def startup_india(data):
             driver.execute_script("arguments[0].click();", element)
             time.sleep(1)
 
-            log.debug("Full Address(Office) Completed")
+            log.info("Full Address(Office) Completed")
 
             # =========================================== #
             #       Authorized Representative Details     #
@@ -436,7 +445,7 @@ def startup_india(data):
             wait.until(EC.visibility_of_element_located((By.ID, "Email Address"))).clear()
             wait.until(EC.visibility_of_element_located((By.ID, "Email Address"))).send_keys(Keys.CONTROL, "v")
             otp = data.get("otp")
-            log.debug("OTP: ", otp)
+            log.info("OTP: ", otp)
             if otp=="1":
                 log.critical("Otp will be triggered")
                 ##paste the code
@@ -487,7 +496,7 @@ def startup_india(data):
             # Click "Director(s) / Partner(s) Details" collapse header
 
             time.sleep(2)
-            log.debug("Director(s) / Partner(s) Details")
+            log.info("Director(s) / Partner(s) Details")
 
             # wait.until(EC.element_to_be_clickable((By.XPATH, "//span[normalize-space()='Director(s) / Partner(s) Details']/ancestor::div[contains(@class,'ant-collapse-header')]"))).click()
 
@@ -584,7 +593,7 @@ def startup_india(data):
 
                 driver.execute_script("arguments[0].click();", header)
             
-            log.debug("Director(s) / Partner(s) Details Completed")
+            log.info("Director(s) / Partner(s) Details Completed")
 
 
             # =========================================== #
@@ -627,7 +636,7 @@ def startup_india(data):
             driver.execute_script("arguments[0].click();", element)
             time.sleep(1)
 
-            log.debug("Information required Completed")
+            log.info("Information required Completed")
 
             # =========================================== #
             #       Nature of Startup                     #
@@ -656,7 +665,7 @@ def startup_india(data):
             driver.execute_script("document.body.click();")
             driver.execute_script("arguments[0].click();", nature_header)
 
-            log.debug("Nature of Startup Completed")
+            log.info("Nature of Startup Completed")
 
             # ======================================================= #
             #       Is the startup creating an innovative product...  #
@@ -701,7 +710,7 @@ def startup_india(data):
             driver.execute_script("document.body.click();")
             driver.execute_script("arguments[0].click();", innovation_header)
 
-            log.debug("Is the startup creating an innovative product Completed")
+            log.info("Is the startup creating an innovative product Completed")
             
             # =========================================================== #
             #       Is the startup creating a scalable business model...  #
@@ -740,7 +749,7 @@ def startup_india(data):
             driver.execute_script("document.body.click();")
             driver.execute_script("arguments[0].click();", scalable_header)
 
-            log.debug("Is the startup creating a scalable business model Completed")
+            log.info("Is the startup creating a scalable business model Completed")
 
             # ========================================= #
             #       Fill brief note textarea ....       #
@@ -794,7 +803,7 @@ def startup_india(data):
             driver.execute_script("document.body.click();")
             driver.execute_script("arguments[0].click();", funding_header)
 
-            log.debug("Has your startup received any funding Completed")
+            log.info("Has your startup received any funding Completed")
 
             # ==================================== #
             #       Startup Activities ....        #
@@ -858,7 +867,7 @@ def startup_india(data):
             driver.execute_script("document.body.click();")
             driver.execute_script("arguments[0].click();", activities_header)
 
-            log.debug("Startup Activities Completed")
+            log.info("Startup Activities Completed")
 
             # ============================================ #
             #       Support Documents ....(pitch deck)     #
@@ -990,7 +999,7 @@ def startup_india(data):
             driver.execute_script("document.body.click();")
             driver.execute_script("arguments[0].click();", support_doc_header)
 
-            log.debug("Support Documents Completed")
+            log.info("Support Documents Completed")
 
             # ==================================== #
             #       Self Certification ....        #
@@ -1003,6 +1012,7 @@ def startup_india(data):
             driver.execute_script("document.body.click();")
             driver.execute_script("arguments[0].click();", self_cert_header)
 
+            log.info("Self Certification Completed")
 
             # -------- SELECT CERTIFICATE OF INCORPORATION --------
 
