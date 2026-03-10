@@ -1040,6 +1040,36 @@ def startup_india(data):
             submit_btn.click()
             time.sleep(5)
             input("Press Enter to close browser...to after final submit")
+            driver.find_element(By.CLASS_NAME, "sumbit-ok").click()
+            time.sleep(5)
+
+            max_retry = 10
+            retry = 0
+
+            while retry < max_retry:
+
+                try:
+                    # Wait for Approved status
+                    approved = WebDriverWait(driver,10).until(EC.visibility_of_element_located((By.XPATH,"//span[normalize-space()='Approved']")))
+                    print("Approved status visible")
+                    # Check download button
+                    download_buttons = driver.find_elements(By.XPATH,"//span[normalize-space()='Download']")
+                    if download_buttons:
+                        print("Download button visible")
+                        # Click download button
+                        download_buttons[0].click()
+                        print("Download started")
+                        break
+                    else:
+                        print("Download button not visible, refreshing page")
+                except Exception as e:
+                    print("Waiting for elements...", e)
+                retry += 1
+                driver.refresh()
+                time.sleep(3)
+
+            if retry == max_retry:
+                raise Exception("Download button not visible after 10 retries")
 
             #driver.quit()
     except Exception as e:
