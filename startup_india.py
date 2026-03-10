@@ -12,6 +12,10 @@ import tempfile
 import datetime
 
 
+def clipboard(value):
+    pyperclip.copy(value)
+    time.sleep(1)
+
 def startup_india(data):
     error = ""
     data = data or {}
@@ -63,7 +67,7 @@ def startup_india(data):
             wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, ".content-list"))).click()
             # Apply Button to click this line
             #wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".button.action-button"))).click()
-            time.sleep(10)
+            time.sleep(15)
             if driver.find_elements(By.CSS_SELECTOR, ".button.action-button"):
                 print("Apply button show")
                 wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".button.action-button"))).click()
@@ -154,13 +158,14 @@ def startup_india(data):
             # website_input.clear()
             # website_input.send_keys(website_value)
             about_text = data.get("aboutcompany")
-            pyperclip.copy(about_text)
+            clipboard(about_text)
 
             textarea = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "textarea.ant-input.caf-textarea-control")))
             textarea.click()
             textarea.send_keys(Keys.CONTROL, "v")
 
             website_value = data.get("website")
+            clipboard(website_value)
             website_input = wait.until(EC.visibility_of_element_located((By.ID, "Website")))
             website_input.clear()
             website_input.send_keys(website_value)
@@ -299,36 +304,40 @@ def startup_india(data):
             wait.until(EC.element_to_be_clickable((By.XPATH, "//div[starts-with(@name,'state_')]//div[contains(@class,'ant-select-selector')]"))).click()
 
             # Type Tamil Nadu
-            driver.switch_to.active_element.send_keys(data.get("comp_address", {}).get("state"))
+            state=data.get("comp_address", {}).get("state")
+            clipboard(state)
+            driver.switch_to.active_element.send_keys(Keys.CONTROL, "v")
 
             # Select Tamil Nadu option
-            wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(@class,'ant-select-item-option-content') and normalize-space()='{}']".format(data.get('comp_address', {}).get('state'))))).click()
+            wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(@class,'ant-select-item-option-content') and normalize-space()='{}']".format(state)))).click()
 
             time.sleep(2)
             # Open District dropdown
             wait.until(EC.element_to_be_clickable((By.XPATH, "//div[starts-with(@name,'district_')]//div[contains(@class,'ant-select-selector')]"))).click()
 
             # Type Chennai
-            driver.switch_to.active_element.send_keys(data.get("comp_address", {}).get("district"))
+            district=data.get("comp_address", {}).get("district")
+            clipboard(district)
+            driver.switch_to.active_element.send_keys(Keys.CONTROL, "v")
 
             # Select Chennai option
-            wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(@class,'ant-select-item-option-content') and normalize-space()='{}']".format(data.get('comp_address', {}).get('district'))))).click()
+            wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(@class,'ant-select-item-option-content') and normalize-space()='{}']".format(district)))).click()
             time.sleep(2)
             # Enter City / Village
 
-            city_value = data.get("comp_address", {}).get("address1")
-
+            city_value = data.get("comp_address", {}).get("city")
+            clipboard(city_value)
             city_input = wait.until(EC.visibility_of_element_located((By.ID, "City/Village")))
             city_input.clear()
-            city_input.send_keys(city_value)
+            city_input.send_keys(Keys.CONTROL, "v")
 
             # Enter Pin Code
 
             pin_value = data.get("comp_address", {}).get("pincode")
-
+            clipboard(pin_value)
             pin_input = wait.until(EC.visibility_of_element_located((By.ID, "Pin Code")))
             pin_input.clear()
-            pin_input.send_keys(pin_value)
+            pin_input.send_keys(Keys.CONTROL, "v")
 
             time.sleep(1)
 
@@ -356,23 +365,27 @@ def startup_india(data):
 
             # Fill Name
             name_value = data.get("directors", [{}])[0].get("Name")
+            clipboard(name_value)
             wait.until(EC.visibility_of_element_located((By.ID, "Name"))).clear()
-            wait.until(EC.visibility_of_element_located((By.ID, "Name"))).send_keys(name_value)
+            wait.until(EC.visibility_of_element_located((By.ID, "Name"))).send_keys(Keys.CONTROL, "v")
 
             # Fill Designation
-            designation_value = "Designation"
+            designation_value = "Director"
+            clipboard(designation_value)
             wait.until(EC.visibility_of_element_located((By.ID, "Designation"))).clear()
-            wait.until(EC.visibility_of_element_located((By.ID, "Designation"))).send_keys(designation_value)
+            wait.until(EC.visibility_of_element_located((By.ID, "Designation"))).send_keys(Keys.CONTROL, "v")
 
             # Fill Mobile Number
-            mobile_value = data.get("mobile") #data.get("directors", [{}])[0].get("Mobile_no")
+            mobile_value = data.get("mobile")#data.get("directors", [{}])[0].get("Mobile_no")
+            clipboard(mobile_value)
             wait.until(EC.visibility_of_element_located((By.ID, "Mobile Number"))).clear()
-            wait.until(EC.visibility_of_element_located((By.ID, "Mobile Number"))).send_keys(mobile_value)
+            wait.until(EC.visibility_of_element_located((By.ID, "Mobile Number"))).send_keys(Keys.CONTROL, "v")
 
             # Fill Email Address
             email_value = data.get("username") #data.get("directors", [{}])[0].get("Email")
+            clipboard(email_value)
             wait.until(EC.visibility_of_element_located((By.ID, "Email Address"))).clear()
-            wait.until(EC.visibility_of_element_located((By.ID, "Email Address"))).send_keys(email_value)
+            wait.until(EC.visibility_of_element_located((By.ID, "Email Address"))).send_keys(Keys.CONTROL, "v")
             otp = data.get("otp")
             if otp=="1":
                 ##paste the code
@@ -458,9 +471,11 @@ def startup_india(data):
                 # ===============================
                 # NAME
                 # ===============================
+                dir_name=data.get("directors", [{}])[i].get("Name", f"Director {i+1}")
+                clipboard(dir_name)
                 name_input = content.find_element(By.XPATH, ".//input[contains(@name,'name_')]")
                 name_input.clear()
-                name_input.send_keys(data.get("directors", [{}])[i].get("Name", f"Director {i+1}"))
+                name_input.send_keys(Keys.CONTROL, "v")
 
                 # ===============================
                 # GENDER
@@ -477,23 +492,29 @@ def startup_india(data):
                 # ===============================
                 # MOBILE
                 # ===============================
+                dir_mobile=data.get("directors", [{}])[i].get("Mobile_no")
+                clipboard(dir_mobile)
                 mobile_input = content.find_element(By.XPATH, ".//input[@name='phoneNumber']")
                 mobile_input.clear()
-                mobile_input.send_keys(data.get("directors", [{}])[i].get("Mobile_no"))
+                mobile_input.send_keys(Keys.CONTROL, "v")
 
                 # ===============================
                 # ADDRESS
                 # ===============================
+                dir_address=data.get("directors", [{}])[i].get("Address")
+                clipboard(dir_address)
                 postal_input = content.find_element(By.XPATH, ".//input[contains(@name,'postal_address')]")
                 postal_input.clear()
-                postal_input.send_keys(data.get("directors", [{}])[i].get("Address"))
+                postal_input.send_keys(Keys.CONTROL, "v")
 
                 # ===============================
                 # EMAIL
                 # ===============================
+                dir_email=data.get("directors", [{}])[i].get("Email")
+                clipboard(dir_email)
                 email_input = content.find_element(By.XPATH, ".//input[contains(@name,'email_address')]")
                 email_input.clear()
-                email_input.send_keys(data.get("directors", [{}])[i].get("Email"))
+                email_input.send_keys(Keys.CONTROL, "v")
 
 
                 # ===============================
@@ -723,7 +744,7 @@ def startup_india(data):
             problem_text = data.get("problem_statement")
             problem_textarea = wait.until(EC.visibility_of_element_located((By.XPATH, "//textarea[contains(@name,'what_is_the_problem_the_startup_is_solving')]")))
             driver.execute_script("arguments[0].scrollIntoView({block:'center'});", problem_textarea)
-            pyperclip.copy(problem_text)
+            clipboard(problem_text)
             problem_textarea.click()
             problem_textarea.send_keys(Keys.CONTROL, "v")
 
@@ -732,7 +753,7 @@ def startup_india(data):
             solution_text = data.get("solution")
             solution_textarea = wait.until(EC.visibility_of_element_located((By.XPATH, "//textarea[contains(@name,'how_does_the_startup_propose_to_solve_the_problem')]")))
             driver.execute_script("arguments[0].scrollIntoView({block:'center'});", solution_textarea)
-            pyperclip.copy(solution_text)
+            clipboard(solution_text)
             solution_textarea.click()
             solution_textarea.send_keys(Keys.CONTROL, "v")
 
@@ -741,7 +762,7 @@ def startup_india(data):
             uniqueness_text = data.get("uniqueness")
             uniqueness_textarea = wait.until(EC.visibility_of_element_located((By.XPATH, "//textarea[contains(@name,'what_is_the_uniqueness_of_the_solution')]")))
             driver.execute_script("arguments[0].scrollIntoView({block:'center'});", uniqueness_textarea)
-            pyperclip.copy(uniqueness_text)
+            clipboard(uniqueness_text)
             uniqueness_textarea.click()
             uniqueness_textarea.send_keys(Keys.CONTROL, "v")
 
@@ -750,7 +771,7 @@ def startup_india(data):
             revenue_text = data.get("revenue_growth")
             revenue_textarea = wait.until(EC.visibility_of_element_located((By.XPATH, "//textarea[contains(@name,'how_does_the_startup_generate_revenue')]")))
             driver.execute_script("arguments[0].scrollIntoView({block:'center'});", revenue_textarea)
-            pyperclip.copy(revenue_text)
+            clipboard(revenue_text)
             revenue_textarea.click()
             revenue_textarea.send_keys(Keys.CONTROL, "v")
                     
@@ -787,6 +808,15 @@ def startup_india(data):
             # type_input.send_keys(Keys.ENTER)
 
             try:
+                type_input = wait.until(EC.element_to_be_clickable((By.XPATH, "(//label[.//span[text()='Type']]/following::input[contains(@class,'ant-select-selection-search-input')][1])[1]")))
+                driver.execute_script("arguments[0].scrollIntoView({block:'center'});", type_input)
+                type_input.click()
+                type_input.send_keys(Keys.CONTROL + "a")
+                type_input.send_keys(Keys.DELETE)
+                time.sleep(1)
+                type_input.send_keys("Pitch Desk")
+                time.sleep(2)
+                type_input.send_keys(Keys.ENTER)
                 # # open Type dropdown
                 # wait.until(EC.element_to_be_clickable((By.XPATH, "(//label[.//span[text()='Type']]/following::div[contains(@class,'ant-select-selector')][1])[1]"))).click()
 
@@ -810,6 +840,7 @@ def startup_india(data):
                 # wait.until(EC.element_to_be_clickable((By.XPATH, "//span[normalize-space()='Pitch desk']/ancestor::div[contains(@class,'ant-select-tree-treenode')]//span[contains(@class,'ant-select-tree-checkbox')]"))).click()
                 # time.sleep(2)
                 # open Type dropdown
+            except:
                 wait.until(EC.element_to_be_clickable((By.XPATH, "(//label[.//span[text()='Type']]/following::div[contains(@class,'ant-select-selector')][1])[1]"))).click()
                 type_input = wait.until(EC.presence_of_element_located((By.XPATH, "//label[.//span[text()='Type']]/following::input[contains(@class,'ant-select-selection-search-input')][1]")))
                 type_input.send_keys(Keys.CONTROL + "a")
@@ -824,16 +855,6 @@ def startup_india(data):
                 time.sleep(2)
                 type_input.send_keys(Keys.ESCAPE)
                 time.sleep(2)
-            except:
-                type_input = wait.until(EC.element_to_be_clickable((By.XPATH, "(//label[.//span[text()='Type']]/following::input[contains(@class,'ant-select-selection-search-input')][1])[1]")))
-                driver.execute_script("arguments[0].scrollIntoView({block:'center'});", type_input)
-                type_input.click()
-                type_input.send_keys(Keys.CONTROL + "a")
-                type_input.send_keys(Keys.DELETE)
-                time.sleep(1)
-                type_input.send_keys("Pitch Desk")
-                time.sleep(2)
-                type_input.send_keys(Keys.ENTER)
 
             # ===== SELECT SUBTYPE : Others =====
             subtype_input = wait.until(EC.element_to_be_clickable((By.XPATH, "(//input[contains(@class,'ant-select-selection-search-input')])[last()-3]")))
@@ -880,7 +901,8 @@ def startup_india(data):
                 time.sleep(5)
                 file_input.send_keys(file_path)
                 time.sleep(2)
-                os.remove(file_path)            
+                os.remove(file_path)   
+            time.sleep(10)         
             support_doc_header = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(normalize-space(),'Please provide links or upload additional document')]/ancestor::div[contains(@class,'ant-collapse-header')]")))
             driver.execute_script("arguments[0].scrollIntoView({block:'center'});", support_doc_header)
             driver.execute_script("document.body.click();")
