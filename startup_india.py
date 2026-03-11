@@ -4,8 +4,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
 import time
 import pyperclip
 import os
@@ -68,7 +66,11 @@ def startup_india(data):
         options.add_argument("--disable-blink-features=AutomationControlled")
         options.add_experimental_option("excludeSwitches", ["enable-automation"])
         options.add_experimental_option("useAutomationExtension", False)
-        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+        # Selenium 4.6+ selenium-manager auto-downloads Chrome + ChromeDriver
+        # Set cache dir to writable path on Render
+        import os
+        os.environ["SE_CACHE_PATH"] = "/tmp/selenium"
+        driver = webdriver.Chrome(options=options)
         driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
         driver.get("https://www.nsws.gov.in/")        
 
