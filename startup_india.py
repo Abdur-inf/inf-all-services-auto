@@ -1,11 +1,9 @@
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
+import undetected_chromedriver as uc
 import time
 import pyperclip
 import os
@@ -59,25 +57,13 @@ def startup_india(data):
     error = ""
     data = data or {}
     try:
-        options = webdriver.ChromeOptions()
+        options = uc.ChromeOptions()
         options.add_argument("--headless=new")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--disable-gpu")
         options.add_argument("--window-size=1920,1080")
-        options.add_argument("--disable-blink-features=AutomationControlled")
-        options.add_experimental_option("excludeSwitches", ["enable-automation"])
-        options.add_experimental_option("useAutomationExtension", False)
-        # Use system Chromium binary installed on Render
-        import shutil
-        chrome_bin = shutil.which("chromium") or shutil.which("chromium-browser") or shutil.which("google-chrome")
-        if chrome_bin:
-            options.binary_location = chrome_bin
-            log.info(f"Chrome binary found: {chrome_bin}")
-        else:
-            log.warning("Chrome binary not found in PATH, using default")
-        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-        driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+        driver = uc.Chrome(options=options, use_subprocess=False)
         driver.get("https://www.nsws.gov.in/")        
 
         wait = WebDriverWait(driver, 15)
