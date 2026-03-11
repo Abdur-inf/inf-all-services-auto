@@ -68,6 +68,14 @@ def startup_india(data):
         options.add_argument("--disable-blink-features=AutomationControlled")
         options.add_experimental_option("excludeSwitches", ["enable-automation"])
         options.add_experimental_option("useAutomationExtension", False)
+        # Use system Chromium binary installed on Render
+        import shutil
+        chrome_bin = shutil.which("chromium") or shutil.which("chromium-browser") or shutil.which("google-chrome")
+        if chrome_bin:
+            options.binary_location = chrome_bin
+            log.info(f"Chrome binary found: {chrome_bin}")
+        else:
+            log.warning("Chrome binary not found in PATH, using default")
         driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
         driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
         driver.get("https://www.nsws.gov.in/")        
